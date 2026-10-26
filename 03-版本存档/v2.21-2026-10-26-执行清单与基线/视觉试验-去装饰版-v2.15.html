@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="author" content="阿砚">
+<title>妙恋畅语 · 应用原型 v2.15</title>
+<style>
+  @import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5.0.0/400.css");
+  @import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5.0.0/500.css");
+  @import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5.0.0/700.css");
+  :root {
+    --font: "Noto Sans SC", "PingFang SC", "HarmonyOS Sans SC", "MiSans", "Microsoft YaHei", system-ui, sans-serif;
+    --ink: #1a1a1f;
+    --muted: #6e6e7a;
+    --faint: #9a9aa6;
+    --line: #e9e8ee;
+    --bg: #f7f6f8;
+    --card: #ffffff;
+    --accent: #c9355f;
+    --accent-soft: #fdf0f3;
+    --ok: #17795f;
+    --ok-soft: #eef7f3;
+    --risk: #b8402f;
+    --risk-soft: #fbf0ed;
+    --cool: #5a6474;
+    --r-card: 16px;
+    --r-btn: 12px;
+    --r-thumb: 8px;
+    --sp1: 4px;
+    --sp2: 8px;
+    --sp3: 12px;
+    --sp4: 16px;
+    --sp5: 24px;
+    --sp6: 32px;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; background: #ededf0; color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .stage { min-height: 100%; display: grid; place-items: center; padding: 28px 16px; }
+  .app { position: relative; width: 390px; height: 800px; background: var(--bg); border: 8px solid #1f1f24; border-radius: 38px; overflow: hidden; }
+  .view { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; padding: 20px 0 84px; scrollbar-width: none; }
+  .view::-webkit-scrollbar { display: none; }
+  .screen { padding: 0 20px; }
+  .screen.enter { animation: fade .18s ease both; }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  .t-date { font-size: 12px; color: var(--faint); }
+  .t-title { font-size: 22px; font-weight: 500; line-height: 1.35; margin: 0; letter-spacing: -.01em; }
+  .t-h2 { font-size: 17px; font-weight: 500; line-height: 1.4; margin: 0; }
+  .t-body { font-size: 15px; line-height: 1.65; margin: 0; }
+  .t-aux { font-size: 12px; line-height: 1.6; color: var(--muted); margin: 0; }
+  .t-cap { font-size: 12px; color: var(--faint); margin: 0; }
+  .accent { color: var(--accent); }
+  .mt4 { margin-top: var(--sp1); }
+  .mt8 { margin-top: var(--sp2); }
+  .mt12 { margin-top: var(--sp3); }
+  .mt16 { margin-top: var(--sp4); }
+  .mt24 { margin-top: var(--sp5); }
+  .mt32 { margin-top: var(--sp6); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-card); padding: var(--sp4); }
+  .soft { background: var(--accent-soft); border-radius: var(--r-card); padding: var(--sp4); }
+  .btn { display: flex; align-items: center; justify-content: center; width: 100%; height: 48px; border: 0; border-radius: var(--r-btn); background: var(--card); color: var(--ink); font-family: inherit; font-size: 15px; font-weight: 500; cursor: pointer; }
+  .btn.primary { background: var(--accent); color: #fff; }
+  .btn:disabled { opacity: .35; cursor: not-allowed; }
+  .btn.plain { background: transparent; color: var(--muted); height: 44px; font-weight: 400; font-size: 14px; }
+  .link { color: var(--accent); font-size: 14px; font-weight: 500; cursor: pointer; display: inline-block; }
+  .nav { position: absolute; left: 0; right: 0; bottom: 0; height: 60px; background: var(--card); border-top: 1px solid var(--line); display: flex; align-items: center; z-index: 5; }
+  .nav.hide { display: none; }
+  .nav div { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--faint); cursor: pointer; height: 100%; }
+  .nav div span { font-size: 12px; line-height: 1; }
+  .nav div.on { color: var(--accent); }
+  .nav svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .list { border-top: 1px solid var(--line); }
+  .li { display: flex; align-items: flex-start; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .li:last-child { border-bottom: 0; }
+  .li.tap { cursor: pointer; }
+  .li .grow { flex: 1; min-width: 0; }
+  .av { width: 40px; height: 40px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-size: 15px; font-weight: 500; flex: none; }
+  .av.g2 { background: #f2f0ec; color: #8a6a3f; }
+  .chev { color: var(--faint); font-size: 15px; flex: none; padding-top: 2px; }
+  .dim { padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .dim:last-child { border-bottom: 0; }
+  .dim .top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .dim .k { font-size: 12px; color: var(--muted); }
+  .dim .v { font-size: 15px; font-weight: 500; }
+  .dim .tr { font-size: 12px; font-weight: 400; margin-left: 6px; }
+  .dim .tr.up { color: var(--accent); }
+  .dim .tr.flat { color: var(--faint); }
+  .dim .tr.down { color: var(--cool); }
+  .dim .ev { font-size: 13px; color: var(--muted); line-height: 1.6; margin-top: 4px; cursor: pointer; }
+  .bound { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; line-height: 1.6; padding: 12px 0; }
+  .bound em { width: 6px; height: 6px; border-radius: 50%; background: var(--ok); flex: none; margin-top: 8px; }
+  .bound.warn { color: var(--risk); }
+  .bound.warn em { background: var(--risk); }
+  .quote { border-left: 2px solid var(--line); padding-left: 12px; font-size: 15px; line-height: 1.65; }
+  .seg { display: flex; gap: 22px; border-bottom: 1px solid var(--line); margin-top: var(--sp4); }
+  .seg div { position: relative; padding: 10px 0 11px; font-size: 14px; color: var(--muted); cursor: pointer; }
+  .seg div.on { color: var(--ink); font-weight: 500; }
+  .seg div.on:after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--accent); border-radius: 2px; }
+  .seg.sm { gap: 18px; border-bottom: 0; margin-top: 0; }
+  .seg.sm div { padding: 6px 0; font-size: 13px; }
+  .field { margin-top: var(--sp4); }
+  .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .input, .area { width: 100%; font-family: inherit; font-size: 15px; line-height: 1.7; color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: var(--r-btn); padding: 13px 14px; outline: none; }
+  .input:focus, .area:focus { border-color: var(--accent); }
+  .area { height: 168px; resize: none; }
+  .shots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: var(--sp3); }
+  .shot { position: relative; background: #fff; border: 1px solid var(--line); border-radius: var(--r-thumb); overflow: hidden; height: 108px; }
+  .shot i { display: block; height: 7px; border-radius: 3px; background: #ececf0; margin: 6px; }
+  .shot i.me { background: #f2d8df; margin-left: 26px; }
+  .shot i.s { width: 60%; }
+  .shot.add { display: grid; place-items: center; border-style: dashed; color: var(--faint); font-size: 18px; cursor: pointer; background: transparent; }
+  .who { flex: none; font-size: 12px; color: var(--muted); cursor: pointer; padding-top: 2px; }
+  .who.on { color: var(--accent); font-weight: 500; }
+  .step { display: flex; align-items: center; gap: 10px; padding: 14px 0; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--faint); }
+  .step:last-child { border-bottom: 0; }
+  .step em { width: 15px; height: 15px; border-radius: 50%; border: 1.5px solid var(--line); flex: none; display: grid; place-items: center; font-size: 9px; font-style: normal; color: #fff; }
+  .step.act { color: var(--ink); }
+  .step.act em { border-color: var(--accent); animation: pl 1s infinite; }
+  .step.done { color: var(--muted); }
+  .step.done em { background: var(--ok); border-color: var(--ok); }
+  @keyframes pl { 50% { opacity: .3; } }
+  .cand { padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .cand:last-child { border-bottom: 0; }
+  .cand .txt { font-size: 15px; line-height: 1.7; }
+  .cand .m { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-size: 12px; color: var(--faint); }
+  .cand .m .copy { margin-left: auto; color: var(--accent); cursor: pointer; font-weight: 500; }
+  .cand.skip .txt { color: var(--muted); }
+  .cand.skip .m b { color: var(--risk); font-weight: 500; }
+  .sheet { position: absolute; inset: 0; background: rgba(20, 20, 24, .28); display: none; align-items: flex-end; z-index: 20; }
+  .sheet.on { display: flex; }
+  .sheetbox { width: 100%; background: var(--card); border-radius: 20px 20px 0 0; padding: 22px 22px 26px; transform: translateY(100%); transition: transform .22s ease; }
+  .sheet.on .sheetbox { transform: none; }
+  .toast { position: fixed; left: 50%; bottom: 110px; transform: translate(-50%, 10px); background: rgba(26, 26, 31, .9); color: #fff; font-size: 13px; padding: 10px 18px; border-radius: 10px; opacity: 0; pointer-events: none; transition: all .2s ease; z-index: 90; }
+  .toast.on { opacity: 1; transform: translate(-50%, 0); }
+  .hint { position: fixed; left: 24px; bottom: 24px; width: 186px; font-size: 12px; color: #8b8b96; line-height: 1.9; }
+  .hint b { display: block; color: #4b4b56; font-size: 12px; font-weight: 500; margin-bottom: 4px; }
+  @media (max-width: 980px) { .hint { display: none; } }
+  @media (max-width: 520px) { .stage { padding: 0; } .app { width: 100%; height: 100vh; height: 100dvh; border: 0; border-radius: 0; } .view { padding-top: 24px; } }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="app">
+    <div class="view" id="view"></div>
+    <nav class="nav hide" id="nav">
+      <div data-go="home" data-tab="home"><svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4v-5.5h-6V20H5a1 1 0 0 1-1-1z"/></svg><span>首页</span></div>
+      <div data-go="import" data-tab="import"><svg viewBox="0 0 24 24"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-5 4z"/></svg><span>分析</span></div>
+      <div data-go="panel" data-tab="panel"><svg viewBox="0 0 24 24"><circle cx="9.5" cy="12" r="4.5"/><circle cx="14.5" cy="12" r="4.5"/></svg><span>关系</span></div>
+      <div data-go="templates" data-tab="templates"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg><span>模板</span></div>
+      <div data-go="me" data-tab="me"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 20c0-3.6 3.4-5.5 7.5-5.5s7.5 1.9 7.5 5.5"/></svg><span>我的</span></div>
+    </nav>
+    <div class="sheet" id="sheet"><div class="sheetbox" id="sheetbox"></div></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="hint">
+  <b>可以试着点</b>
+  <span>· 首页当前对象卡</span>
+  <span>· 关系页任意一条证据</span>
+  <span>· 分析 → 截图识别</span>
+  <span>· 分析页底部「边界场景」</span>
+</div>
+<script>
+function lsGet(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+
+const D = {
+  screen: 'welcome',
+  current: 'linxia',
+  sampleMode: 'normal',
+  importTab: 'shot',
+  ocrMode: null,
+  ocrRows: [],
+  apiKey: lsGet('mly_api_key')
+};
+
+const PEOPLE = {
+  linxia: {
+    id: 'linxia', name: '林夏', av: '夏', avc: '',
+    meta: '认识 46 天 · 同城',
+    stage: '暧昧升温', tr: 'up', trText: '比上周更主动',
+    summary: '她开始主动找你，聊得比上个月深，但约见这件事一直没落地。',
+    today: '她提了重映却没接住。给一个容易拒绝的具体选择，把决定权留给她。',
+    dims: [
+      { k: '熟悉度', lv: '较高', tr: 'up', trText: '升温', ev: '她连续三次主动补充电影细节，也提到过家里的猫。', src: '来自 10 月 23 日的截图' },
+      { k: '互动热度', lv: '中等', tr: 'up', trText: '升温', ev: '她主动开启话题 3 次，上周 1 次。', src: '来自 10 月 20–25 日的截图' },
+      { k: '舒适度', lv: '较高', tr: 'flat', trText: '基本没变', ev: '她会用「哈哈」这类轻松应答，也愿意说自己累。', src: '来自 10 月 24 日的截图' },
+      { k: '线下推进', lv: '较低', tr: 'down', trText: '转冷', ev: '她提过「周末好像还有重映」，但没接住邀约。', src: '来自 10 月 22 日的截图' }
+    ],
+    bound: { ok: true, text: '未发现回避或拒绝信号。' },
+    info: '电影 · 猫 · 忌熬夜'
+  },
+  anran: {
+    id: 'anran', name: '安然', av: '安', avc: 'g2',
+    meta: '认识 12 天 · 同事的朋友',
+    stage: '熟悉建立', tr: 'flat', trText: '和上周差不多',
+    summary: '还在互相摸底。聊得动，但话题一直停在工作和健身上。',
+    today: '别急着约。先找一个她愿意多说两句的话题。',
+    dims: [
+      { k: '熟悉度', lv: '中等', tr: 'up', trText: '升温', ev: '聊过两次工作和健身习惯，信息还不深。', src: '来自 10 月 21 日的截图' },
+      { k: '互动热度', lv: '中等', tr: 'down', trText: '转冷', ev: '这周她主动 1 次，上周 2 次。', src: '来自 10 月 20–25 日的截图' },
+      { k: '舒适度', lv: '中等', tr: 'flat', trText: '基本没变', ev: '回复速度稳定，但没有玩笑或自嘲。', src: '来自近一周的截图' },
+      { k: '线下推进', lv: '较低', tr: 'flat', trText: '基本没变', ev: '还没出现任何线下场景的暗示。', src: '暂无可引用原文' }
+    ],
+    bound: { ok: true, text: '未发现回避或拒绝信号。' },
+    info: '健身 · 咖啡 · 早起'
+  }
+};
+
+const DEMO = {
+  id: 'demo', name: '边界示例', av: '例', avc: 'g2',
+  meta: '用于演示拒绝信号',
+  stage: '需要空间', tr: 'down', trText: '在退',
+  summary: '她在退。主动次数掉到 0，并且明确说过「改天吧」。',
+  today: '别再提约。先让节奏松下来，等她自己开口。',
+  dims: [
+    { k: '熟悉度', lv: '中等', tr: 'flat', trText: '基本没变', ev: '还聊得动，但她开始缩短回复。', src: '来自 10 月 24 日的截图' },
+    { k: '互动热度', lv: '较低', tr: 'down', trText: '转冷', ev: '这周她主动 0 次，上周 4 次。', src: '来自 10 月 20–25 日的截图' },
+    { k: '舒适度', lv: '较低', tr: 'down', trText: '转冷', ev: '她两次把话题收掉。', src: '来自 10 月 23 日的截图' },
+    { k: '线下推进', lv: '较低', tr: 'down', trText: '转冷', ev: '她明确说过「改天吧」。', src: '来自 10 月 24 日的截图' }
+  ],
+  bound: { ok: false, text: '检出明确拒绝（「改天吧」）。邀约类模板已停用，建议整体切换为「暂不推进」。' },
+  info: '—'
+};
+
+const REPLIES = {
+  linxia: [
+    { ok: true, text: '那就别硬撑了，先补觉。重映跑不掉，等你这周缓过来我再问你还想不想去。', m: '真诚 · 把决定权给她' },
+    { ok: true, text: '累了就先歇着，我记着这部片。你哪天想出门了说一声，我配合你时间。', m: '克制 · 不追问' },
+    { ok: false, text: '那正好，周六我订了两张票，你休息好我们直接去。', m: '越界 · 她说了累，你还替她定时间' }
+  ],
+  anran: [
+    { ok: true, text: '那明天电梯就是你的救命恩人。记得拉伸，别硬扛。', m: '幽默 · 轻，不追问' },
+    { ok: true, text: '练腿第二天最难受，热水泡一下会好点。你一般练完怎么恢复？', m: '真诚 · 留了个话头' },
+    { ok: false, text: '那我明天去接你下班吧，正好扶你下楼。', m: '越界 · 认识 12 天，接下班太重' }
+  ],
+  demo: [
+    { ok: true, text: '行，你先忙。等你有空了我们再说。', m: '克制 · 接住了她的拒绝' },
+    { ok: true, text: '好，那我不催你了。最近忙完记得歇会儿。', m: '真诚 · 不追加邀约' },
+    { ok: false, text: '那下周六呢？下周六总可以吧。', m: '越界 · 把「改天吧」当成可以再问' }
+  ]
+};
+
+const LASTS = {
+  linxia: '周末好像还有重映，不过我这周有点累',
+  anran: '今天练腿，明天大概下不了楼',
+  demo: '这周不太行，改天吧'
+};
+
+const TEMPLATES = [
+  { s: '初识', t: '你提到的那家店我也路过过，不过一直没进去。值得排一次队吗？', g: '提问 · 低压力' },
+  { s: '初识', t: '看你发的那张照片，是在哪拍的？光线挺好看。', g: '自然开场' },
+  { s: '暧昧', t: '刚看到一部片，第一反应是你要是在应该会喜欢。', g: '暗示 · 不追问' },
+  { s: '暧昧', t: '今天有点累，跟你聊两句反而松下来了。', g: '示弱 · 真诚' },
+  { s: '冲突', t: '我说话可能有点急，让你不舒服了。我想听你怎么想。', g: '道歉 · 不辩解' },
+  { s: '冲突', t: '我们现在像是在说两件不同的事，要不先停一下。', g: '降温' },
+  { s: '边界', t: '好，我记住了。那我不提这事了，你需要空间就说。', g: '尊重拒绝' },
+  { s: '边界', t: '收到，不勉强。等你方便了再聊。', g: '不追加' }
+];
+
+const OCR_N = [[false, '周末好像还有重映'], [true, '是吗，哪个影院'], [false, '就那个老片，我有点想看但懒得动'], [true, '那改天？'], [false, '嗯，再看吧'], [true, '最近在忙什么'], [false, '有点累，工作压得慌']];
+const OCR_B = [[true, '周六有空吗，一起吃饭'], [false, '这周不太行'], [true, '那周日呢'], [false, '也不太想出门'], [true, '是不是我太急了'], [false, '不是，就是有点累'], [false, '改天吧']];
+
+function person() {
+  if (D.sampleMode === 'boundary' && (D.screen === 'analysis' || D.screen === 'reply')) return DEMO;
+  return PEOPLE[D.current];
+}
+
+function others() {
+  return Object.keys(PEOPLE).filter(function (k) { return k !== D.current; });
+}
+
+function welcomeScreen() {
+  return '<div class="screen enter">' +
+    '<div class="mt32"><p class="t-title">妙恋畅语</p>' +
+    '<p class="t-body mt8" style="color:var(--muted)">把聊不明白的话，说明白一点。</p></div>' +
+    '<div class="mt32 list">' +
+      '<div class="li"><div class="grow"><p class="t-body">看清热度怎么变</p><p class="t-aux mt4">不是打分，是告诉你这周和上周差在哪。</p></div></div>' +
+      '<div class="li"><div class="grow"><p class="t-body">三条候选回复</p><p class="t-aux mt4">其中一条是故意留给你的反面例子。</p></div></div>' +
+      '<div class="li"><div class="grow"><p class="t-body">推不推进，你说了算</p><p class="t-aux mt4">检出拒绝信号时，邀约建议会直接停用。</p></div></div>' +
+    '</div>' +
+    '<div class="mt24"><label class="agree" style="display:flex;gap:10px;align-items:flex-start;cursor:pointer">' +
+      '<input type="checkbox" id="agree" style="margin-top:5px;accent-color:var(--accent)">' +
+      '<span class="t-aux">我确认这些聊天内容我有权提供，并且尊重对方的意愿和边界</span></label></div>' +
+    '<div class="mt16"><button class="btn primary" id="enter" disabled>开始</button></div>' +
+    '<div class="mt8"><button class="btn plain" data-go="home">先随便看看</button></div>' +
+    '<p class="t-cap mt16" style="text-align:center">不需要注册。模型 Key 只存在你自己的设备上。</p>' +
+  '</div>';
+}
+
+function homeScreen() {
+  const p = PEOPLE[D.current];
+  const rest = others().map(function (k) {
+    const q = PEOPLE[k];
+    return '<div class="li tap" data-person="' + k + '">' +
+      '<div class="av ' + q.avc + '">' + q.av + '</div>' +
+      '<div class="grow"><p class="t-body">' + q.name + '</p><p class="t-aux mt4">' + q.stage + ' · ' + q.meta + '</p></div>' +
+      '<span class="chev">›</span></div>';
+  }).join('');
+  return '<div class="screen enter">' +
+    '<p class="t-date">10 月 25 日 周日</p>' +
+    '<p class="t-title mt4">晚上好</p>' +
+    '<div class="card mt24">' +
+      '<div class="li tap" style="border:0;padding:0" data-person="' + p.id + '">' +
+        '<div class="av ' + p.avc + '">' + p.av + '</div>' +
+        '<div class="grow"><p class="t-h2">' + p.name + '</p><p class="t-aux mt4">' + p.meta + '</p></div>' +
+        '<span class="chev">›</span>' +
+      '</div>' +
+      '<p class="t-h2 mt16">' + p.stage + ' <span class="t-aux" style="font-weight:400;margin-left:6px">' + p.trText + '</span></p>' +
+      '<p class="t-body mt8" style="color:var(--muted)">' + p.summary + '</p>' +
+      '<p class="t-aux mt12">依据 · ' + p.dims[1].ev + '</p>' +
+      '<div class="mt12"><span class="link" data-person="' + p.id + '">看关系面板 ›</span></div>' +
+    '</div>' +
+    '<div class="soft mt16">' +
+      '<p class="t-cap accent">今天可以做</p>' +
+      '<p class="t-body mt8">' + p.today + '</p>' +
+      '<div class="mt12"><span class="link" data-go="reply">去看回复建议 ›</span></div>' +
+    '</div>' +
+    '<div class="mt16"><button class="btn primary" data-go="import">分析一段聊天</button></div>' +
+    '<div class="mt32"><p class="t-cap">其他对象</p><div class="list mt8">' + rest + '</div></div>' +
+  '</div>';
+}
+
+function panelScreen() {
+  const p = PEOPLE[D.current];
+  const tabs = '<div class="seg">' + Object.keys(PEOPLE).map(function (k) {
+    return '<div class="' + (k === D.current ? 'on' : '') + '" data-person="' + k + '">' + PEOPLE[k].name + '</div>';
+  }).join('') + '<div data-go="new">新建</div></div>';
+  const dims = p.dims.map(function (d) {
+    return '<div class="dim" data-dim="' + d.k + '">' +
+      '<div class="top"><span class="k">' + d.k + '</span>' +
+      '<span class="v">' + d.lv + '<span class="tr ' + d.tr + '">' + d.trText + '</span></span></div>' +
+      '<p class="ev">' + d.ev + '</p></div>';
+  }).join('');
+  return '<div class="screen enter">' +
+    '<p class="t-title">关系</p>' + tabs +
+    '<div class="mt16">' +
+      '<p class="t-h2">' + p.stage + '</p>' +
+      '<p class="t-aux mt4">' + p.trText + '</p>' +
+      '<p class="t-body mt12" style="color:var(--muted)">' + p.summary + '</p>' +
+    '</div>' +
+    '<div class="mt24"><p class="t-cap">四个维度</p><div class="list mt8">' + dims + '</div></div>' +
+    '<div class="mt16"><div class="bound ' + (p.bound.ok ? '' : 'warn') + '"><em></em><span>' + p.bound.text + '</span></div></div>' +
+    '<div class="soft mt8"><p class="t-cap accent">下一步</p><p class="t-body mt8">' + p.today + '</p>' +
+      '<div class="mt12"><span class="link" data-go="reply">去看回复建议 ›</span></div></div>' +
+    '<div class="mt24 list">' +
+      '<div class="li tap" data-fold="info"><div class="grow"><p class="t-body">关键信息</p><p class="t-aux mt4">' + p.info + '</p></div><span class="chev">›</span></div>' +
+      '<div class="li tap" data-fold="time"><div class="grow"><p class="t-body">时间线</p><p class="t-aux mt4">近 30 天 3 条</p></div><span class="chev">›</span></div>' +
+    '</div>' +
+  '</div>';
+}
+
+function importScreen() {
+  const seg = '<div class="seg">' +
+    '<div class="' + (D.importTab === 'shot' ? 'on' : '') + '" data-tab2="shot">截图识别</div>' +
+    '<div class="' + (D.importTab === 'paste' ? 'on' : '') + '" data-tab2="paste">粘贴文本</div>' +
+  '</div>';
+  const demo = '<p class="t-cap mt16" style="text-align:center">演示：<span class="link" id="fill-normal">普通场景</span> · <span class="link" id="fill-boundary">边界场景</span></p>';
+
+  if (D.importTab === 'paste') {
+    const txt = D.sampleMode === 'boundary'
+      ? '我：周六有空吗，一起吃饭\n她：这周不太行\n我：那周日呢\n她：也不太想出门\n我：是不是我太急了\n她：不是，就是有点累\n她：改天吧'
+      : '她：周末好像还有重映\n我：是吗，哪个影院\n她：就那个老片，我有点想看但懒得动\n我：那改天？\n她：嗯，再看吧\n我：最近在忙什么\n她：有点累，工作压得慌';
+    return '<div class="screen enter">' +
+      '<p class="t-title">导入聊天</p>' + seg +
+      '<div class="field"><label>一行一条，开头标「我：」或「她：」</label><textarea class="area" id="chattext">' + txt + '</textarea></div>' +
+      '<p class="t-aux mt12">粘贴是保底方案。微信只能单条复制，30 条就要复制 30 次，所以才要做截图识别。</p>' +
+      '<div class="mt24"><button class="btn primary" id="do-analyze">开始分析</button></div>' + demo +
+    '</div>';
+  }
+  const shots = [0, 1, 2].map(function () {
+    return '<div class="shot"><i class="s"></i><i class="me"></i><i></i><i class="me"></i></div>';
+  }).join('');
+  return '<div class="screen enter">' +
+    '<p class="t-title">导入聊天</p>' + seg +
+    '<div class="mt24"><div style="display:flex;justify-content:space-between;align-items:baseline">' +
+      '<span class="t-cap">已选 3 张</span><span class="t-cap">最多 20 张</span></div></div>' +
+    '<div class="shots">' + shots + '<div class="shot add">＋</div></div>' +
+    '<p class="t-aux mt12">连续截图会有重叠，识别时自动去重；顺序按图里的时间戳排，不靠文件名。</p>' +
+    '<p class="t-aux mt8">识别全程在本机完成，图片不出设备。截图里常有对方的头像和昵称，识别前请先确认。</p>' +
+    '<div class="mt24"><button class="btn primary" id="do-ocr">开始识别</button></div>' + demo +
+  '</div>';
+}
+
+function ensureOcr() {
+  if (D.ocrMode === D.sampleMode) return;
+  const base = D.sampleMode === 'boundary' ? OCR_B : OCR_N;
+  D.ocrRows = base.map(function (r) { return { me: r[0], t: r[1] }; });
+  D.ocrMode = D.sampleMode;
+}
+
+function ocrScreen() {
+  ensureOcr();
+  const mine = D.ocrRows.filter(function (r) { return r.me; }).length;
+  const rows = D.ocrRows.map(function (r, i) {
+    return '<div class="li"><span class="who ' + (r.me ? 'on' : '') + '" data-ocr="' + i + '">' + (r.me ? '我' : '对方') + '</span>' +
+      '<div class="grow"><p class="t-body">' + r.t + '</p></div></div>';
+  }).join('');
+  return '<div class="screen enter">' +
+    '<p class="t-title">确认谁说的</p>' +
+    '<p class="t-aux mt8">识别出 ' + D.ocrRows.length + ' 条，你 ' + mine + ' 条、对方 ' + (D.ocrRows.length - mine) + ' 条。点左边的字可以改。</p>' +
+    '<div class="list mt16">' + rows + '</div>' +
+    '<p class="t-aux mt16">改错一条，结论就可能反。所以这一屏不能省。</p>' +
+    '<div class="mt24"><button class="btn primary" id="do-analyze">确认，开始分析</button></div>' +
+    '<div class="mt8"><button class="btn plain" data-go="import">返回</button></div>' +
+  '</div>';
+}
+
+function analyzingScreen() {
+  const steps = [
+    ['本机识别文字', '2.4s'],
+    ['判断边界信号 · 本地规则', '20ms'],
+    ['分析关系变化 · 模型', '4.6s'],
+    ['生成三条回复 · 并行', '同时']
+  ];
+  const rows = steps.map(function (s, i) {
+    return '<div class="step ' + (i === 0 ? 'act' : '') + '" id="st' + i + '"><em></em><span>' + s[0] + '</span>' +
+      '<span style="margin-left:auto;font-size:12px;color:var(--faint)">' + s[1] + '</span></div>';
+  }).join('');
+  return '<div class="screen enter">' +
+    '<p class="t-title">正在分析</p>' +
+    '<div class="list mt24">' + rows + '</div>' +
+    '<p class="t-aux mt24">边界判定 20 毫秒就出了。所以"能不能约"这件事，永远不会比模型慢。</p>' +
+  '</div>';
+}
+
+function analysisScreen() {
+  const p = person();
+  const warn = !p.bound.ok;
+  const sigs = warn
+    ? ['她这周主动 0 次（上周 4 次）', '她两次主动把话题收掉', '她明确说过「改天吧」', '你连续三次提议、她三次都婉拒']
+    : ['她主动开启话题 3 次（上周 1 次）', '她两次补充了你没问的细节', '她提到累，但没有拒绝聊天', '你提重映，她没接这个话头'];
+  return '<div class="screen enter">' +
+    '<p class="t-title">分析结果</p>' +
+    '<p class="t-cap mt16">看到的信号</p>' +
+    '<div class="list mt8">' + sigs.map(function (s) { return '<div class="li"><div class="grow"><p class="t-body">' + s + '</p></div></div>'; }).join('') + '</div>' +
+    '<p class="t-cap mt24">关系判断</p>' +
+    '<p class="t-h2 mt8">' + p.stage + '<span class="t-aux" style="font-weight:400;margin-left:8px">' + p.trText + '</span></p>' +
+    '<p class="t-aux mt8">' + (warn ? '从「暧昧升温」退到「需要空间」。一个拒绝信号就够降级。' : '从「熟悉建立」进到「暧昧升温」。进阶段需要多个信号同时成立。') + '</p>' +
+    '<div class="mt16"><div class="bound ' + (warn ? 'warn' : '') + '"><em></em><span>' + p.bound.text + '</span></div></div>' +
+    '<div class="mt24"><button class="btn primary" data-go="reply">生成回复建议</button></div>' +
+    '<div class="mt8"><button class="btn plain" data-go="panel">回到关系面板</button></div>' +
+  '</div>';
+}
+
+function replyScreen() {
+  const p = person();
+  const warn = !p.bound.ok;
+  const tone = ['温柔', '幽默', '真诚', '克制'].map(function (t, i) {
+    return '<div class="' + (i === 0 ? 'on' : '') + '"><span>' + t + '</span></div>';
+  }).join('');
+  const cands = (REPLIES[p.id] || REPLIES.linxia).map(function (r) {
+    return '<div class="cand ' + (r.ok ? '' : 'skip') + '">' +
+      '<p class="txt">' + r.text + '</p>' +
+      '<div class="m">' + (r.ok ? '<span>' + r.m + '</span>' : '<b>这条先别发</b><span>' + r.m + '</span>') +
+      (r.ok ? '<span class="copy" data-copy="1">复制</span>' : '') + '</div></div>';
+  }).join('');
+  return '<div class="screen enter">' +
+    '<p class="t-title">回复建议</p>' +
+    '<p class="quote mt16">' + (LASTS[p.id] || LASTS.linxia) + '</p>' +
+    '<div class="seg sm mt24">' + tone + '</div>' +
+    (warn ? '<div class="bound warn mt8"><em></em><span>她说了「改天吧」，这次不推进。3 条邀约模板已停用。</span></div>' : '') +
+    '<div class="mt16">' + cands + '</div>' +
+    '<p class="t-cap mt16">三条里有一条是故意留给你对照的。能不能发，你自己判。</p>' +
+  '</div>';
+}
+
+function templatesScreen() {
+  const scenes = ['全部', '初识', '暧昧', '冲突', '边界'].map(function (s, i) {
+    return '<div class="' + (i === 0 ? 'on' : '') + '">' + s + '</div>';
+  }).join('');
+  return '<div class="screen enter">' +
+    '<p class="t-title">模板库</p>' +
+    '<div class="seg">' + scenes + '</div>' +
+    '<input class="input mt16" placeholder="搜场景、语气或一句话">' +
+    '<div class="mt16">' + TEMPLATES.map(function (t) {
+      return '<div class="cand"><p class="txt">' + t.t + '</p><div class="m"><span>' + t.s + ' · ' + t.g + '</span></div></div>';
+    }).join('') + '</div>' +
+    '<p class="t-cap mt16">首版种子 100 条，这里放 8 条示意。</p>' +
+  '</div>';
+}
+
+function newScreen() {
+  return '<div class="screen enter">' +
+    '<p class="t-title">新建对象</p>' +
+    '<div class="field"><label>怎么称呼她</label><input class="input" placeholder="林夏"></div>' +
+    '<div class="field"><label>怎么认识的</label><input class="input" placeholder="朋友介绍 / 同事 / 同城活动"></div>' +
+    '<div class="field"><label>她在意的事</label><input class="input" placeholder="电影、猫、讨厌熬夜"></div>' +
+    '<div class="field"><label>你自己知道的分寸</label><textarea class="area" style="height:92px" placeholder="比如：不要在她忙的时候连发消息"></textarea></div>' +
+    '<div class="mt24"><button class="btn primary" data-go="home">保存</button></div>' +
+    '<div class="mt8"><button class="btn plain" data-go="panel">取消</button></div>' +
+  '</div>';
+}
+
+function settingsScreen() {
+  const st = D.apiKey ? '已保存在本机' : '还没填。没填时只走模板库，不报错。';
+  return '<div class="screen enter">' +
+    '<p class="t-title">模型设置</p>' +
+    '<div class="field"><label>DeepSeek API Key</label><input class="input" id="keyinput" type="password" placeholder="sk-..." value="' + D.apiKey + '"></div>' +
+    '<p class="t-aux mt8" id="keystate">' + st + '</p>' +
+    '<div class="mt16"><button class="btn primary" id="save-key">保存到本机</button></div>' +
+    '<div class="mt8"><button class="btn plain" id="clear-key">清除</button></div>' +
+    '<p class="t-aux mt24">Key 只存在这台设备里，不上传、不进日志、不进代码仓库。换设备要重新填。</p>' +
+    '<p class="t-aux mt12">网页版直连会被浏览器的跨域策略拦掉。想跑通真实请求，要用 Windows 桌面版或 Android 真机。</p>' +
+    '<div class="mt24"><button class="btn plain" data-go="me">返回</button></div>' +
+  '</div>';
+}
+
+function meScreen() {
+  const rows = [
+    ['模型设置', 'settings'],
+    ['导出我的数据', ''],
+    ['删除聊天原文', ''],
+    ['关于', '']
+  ].map(function (r) {
+    return '<div class="li ' + (r[1] ? 'tap' : '') + '" ' + (r[1] ? 'data-go="' + r[1] + '"' : '') + '>' +
+      '<div class="grow"><p class="t-body">' + r[0] + '</p></div><span class="chev">›</span></div>';
+  }).join('');
+  return '<div class="screen enter">' +
+    '<p class="t-title">我的</p>' +
+    '<div class="list mt24">' + rows + '</div>' +
+    '<div class="list"><div class="li tap"><div class="grow"><p class="t-body" style="color:var(--risk)">删除账户</p></div><span class="chev">›</span></div></div>' +
+    '<p class="t-cap mt32">妙恋畅语 · 原型 v2.15<br>设计与排布 · 阿砚 · 2026-10-25</p>' +
+  '</div>';
+}
+
+const SCREENS = {
+  welcome: welcomeScreen, home: homeScreen, panel: panelScreen, import: importScreen, ocr: ocrScreen,
+  analyzing: analyzingScreen, analysis: analysisScreen, reply: replyScreen, templates: templatesScreen,
+  new: newScreen, settings: settingsScreen, me: meScreen
+};
+
+function render() {
+  if (window.__timers) window.__timers.forEach(clearTimeout);
+  window.__timers = [];
+  document.getElementById('view').innerHTML = (SCREENS[D.screen] || homeScreen)();
+  const nav = document.getElementById('nav');
+  nav.className = 'nav' + (D.screen === 'welcome' || D.screen === 'analyzing' ? ' hide' : '');
+  Array.prototype.forEach.call(nav.querySelectorAll('[data-tab]'), function (el) {
+    el.className = el.dataset.tab === D.screen ? 'on' : '';
+  });
+  document.getElementById('view').scrollTop = 0;
+  if (D.screen === 'welcome') {
+    const cb = document.getElementById('agree');
+    const btn = document.getElementById('enter');
+    cb.addEventListener('change', function () { btn.disabled = !cb.checked; });
+    btn.addEventListener('click', function () { go('home'); });
+  }
+  if (D.screen === 'analyzing') {
+    [280, 620, 1420, 2020].forEach(function (ms, i) {
+      window.__timers.push(setTimeout(function () {
+        const el = document.getElementById('st' + i);
+        if (!el) return;
+        el.classList.remove('act');
+        el.classList.add('done');
+        el.querySelector('em').textContent = '✓';
+        const nx = document.getElementById('st' + (i + 1));
+        if (nx) nx.classList.add('act');
+      }, ms));
+    });
+    window.__timers.push(setTimeout(function () { go('analysis'); }, 2500));
+  }
+}
+
+function go(s) {
+  if (s === 'home' || s === 'panel') D.sampleMode = 'normal';
+  D.screen = s;
+  render();
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  clearTimeout(window.__tt);
+  window.__tt = setTimeout(function () { t.classList.remove('on'); }, 1600);
+}
+
+function openSheet(k) {
+  const p = PEOPLE[D.current];
+  const d = p.dims.filter(function (x) { return x.k === k; })[0];
+  if (!d) return;
+  document.getElementById('sheetbox').innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:baseline">' +
+      '<span class="t-cap">' + d.k + '</span>' +
+      '<span class="t-h2">' + d.lv + '</span>' +
+    '</div>' +
+    '<p class="t-aux mt8">' + d.trText + '</p>' +
+    '<p class="t-body mt16">' + d.ev + '</p>' +
+    '<div class="quote mt16">' + d.src + '</div>' +
+    '<p class="t-cap mt12">证据取自截图原图，不是识别出来的文字。</p>';
+  document.getElementById('sheet').classList.add('on');
+}
+
+document.addEventListener('click', function (ev) {
+  const sheet = document.getElementById('sheet');
+  if (ev.target === sheet) { sheet.classList.remove('on'); return; }
+  const dim = ev.target.closest('[data-dim]');
+  if (dim) { openSheet(dim.dataset.dim); return; }
+  const tab2 = ev.target.closest('[data-tab2]');
+  if (tab2) { D.importTab = tab2.dataset.tab2; render(); return; }
+  const ocr = ev.target.closest('[data-ocr]');
+  if (ocr) { const i = +ocr.dataset.ocr; D.ocrRows[i].me = !D.ocrRows[i].me; render(); return; }
+  const per = ev.target.closest('[data-person]');
+  if (per) { D.current = per.dataset.person; D.sampleMode = 'normal'; go('panel'); return; }
+  const copy = ev.target.closest('[data-copy]');
+  if (copy) { toast('已复制，发不发你自己定'); return; }
+  const fold = ev.target.closest('[data-fold]');
+  if (fold) { toast('原型里暂不展开'); return; }
+  const nav = ev.target.closest('[data-go]');
+  if (nav) { go(nav.dataset.go); return; }
+  if (ev.target.id === 'do-ocr') { go('ocr'); return; }
+  if (ev.target.id === 'do-analyze') { go('analyzing'); return; }
+  if (ev.target.id === 'fill-normal') { D.sampleMode = 'normal'; render(); return; }
+  if (ev.target.id === 'fill-boundary') { D.sampleMode = 'boundary'; render(); return; }
+  if (ev.target.id === 'save-key') {
+    const v = document.getElementById('keyinput').value.trim();
+    D.apiKey = v;
+    if (v) lsSet('mly_api_key', v); else lsDel('mly_api_key');
+    document.getElementById('keystate').textContent = v ? '已保存在本机' : '还没填。没填时只走模板库，不报错。';
+    toast(v ? '已保存' : '已清空');
+    return;
+  }
+  if (ev.target.id === 'clear-key') {
+    D.apiKey = '';
+    lsDel('mly_api_key');
+    document.getElementById('keyinput').value = '';
+    document.getElementById('keystate').textContent = '还没填。没填时只走模板库，不报错。';
+    toast('已清除');
+    return;
+  }
+});
+
+render();
+</script>
+</body>
+</html>

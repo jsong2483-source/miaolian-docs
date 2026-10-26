@@ -1,0 +1,794 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="author" content="阿砚">
+<title>妙恋畅语 · 应用原型 v2.12</title>
+<style>
+  @import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5.0.0/400.css");
+  @import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5.0.0/500.css");
+  @import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5.0.0/700.css");
+  @import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5.0.0/500.css");
+  @import url("https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.0/400.css");
+  @import url("https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.0/500.css");
+  @import url("https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.0/600.css");
+  :root {
+    --ink: #1c1b22;
+    --muted: #7a7585;
+    --faint: #b6aec1;
+    --hair: rgba(28, 27, 34, .07);
+    --rose: #ff4f7b;
+    --purple: #6c4ce0;
+    --lav: rgba(108, 76, 224, .09);
+    --good: #14a57c;
+    --warn: #c1663f;
+    --up: #e0332f;
+    --down: #12a05c;
+    --flat: #b3aabf;
+    --f-sans: "Noto Sans SC", "PingFang SC", "HarmonyOS Sans SC", "MiSans", "Microsoft YaHei", system-ui, sans-serif;
+    --f-num: "Inter", "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+    --f-serif: "Noto Serif SC", "Songti SC", "Source Han Serif SC", "SimSun", serif;
+    --glass: rgba(255, 255, 255, .7);
+    --glass-b: rgba(255, 255, 255, .88);
+    --shadow: 0 10px 30px rgba(38, 24, 64, .07);
+    --r: 22px;
+    --r-s: 16px;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; background: #efecf3; color: var(--ink); font-family: var(--f-sans); font-size: 13px; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  .stage { min-height: 100%; display: grid; place-items: center; padding: 26px 16px; }
+  .app { position: relative; width: 390px; height: 800px; background: #fbf9fd; border: 10px solid #232029; border-radius: 52px; overflow: hidden; box-shadow: 0 30px 70px rgba(38, 24, 64, .20); }
+  .app::before { content: ""; position: absolute; width: 320px; height: 320px; border-radius: 50%; top: -120px; right: -100px; background: rgba(255, 79, 123, .15); filter: blur(50px); pointer-events: none; }
+  .app::after { content: ""; position: absolute; width: 300px; height: 300px; border-radius: 50%; bottom: -110px; left: -110px; background: rgba(108, 76, 224, .14); filter: blur(52px); pointer-events: none; }
+  .sbar { position: absolute; top: 0; left: 0; right: 0; height: 36px; display: flex; justify-content: space-between; align-items: center; padding: 0 28px; font-size: 11px; color: var(--muted); z-index: 6; pointer-events: none; }
+  .view { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; padding: 36px 0 100px; scrollbar-width: none; }
+  .view::-webkit-scrollbar { display: none; }
+  .screen { padding: 0 18px; }
+  .screen.enter { animation: fade .22s ease both; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .card { background: var(--glass); border: 1px solid var(--glass-b); border-radius: var(--r); box-shadow: var(--shadow); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+  .h1 { font-family: var(--f-serif); font-size: 22px; font-weight: 500; margin: 0; letter-spacing: .01em; }
+  .sub { font-size: 11.5px; color: var(--muted); line-height: 1.75; margin: 6px 0 0; }
+  .topbar { display: flex; align-items: center; gap: 10px; padding: 4px 0 14px; }
+  .topbar .tt { font-size: 13.5px; font-weight: 500; }
+  .back { width: 34px; height: 34px; border-radius: 12px; border: 0; background: rgba(255, 255, 255, .72); color: var(--ink); font-size: 15px; cursor: pointer; display: grid; place-items: center; flex: none; }
+  .btn { width: 100%; height: 46px; border-radius: 16px; border: 0; font-family: inherit; font-size: 13.5px; font-weight: 500; background: #fff; color: var(--ink); cursor: pointer; transition: transform .12s ease; }
+  .btn:active { transform: scale(.985); }
+  .btn.primary { background: linear-gradient(145deg, #ff7396 0%, #a97ae6 100%); color: #fff; box-shadow: 0 10px 22px rgba(168, 124, 232, .30); }
+  .btn.ghost { background: transparent; color: var(--muted); height: 40px; font-size: 12.5px; }
+  .btn.line { background: rgba(255, 255, 255, .72); border: 1px solid var(--hair); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn.sm { height: 38px; font-size: 12.5px; border-radius: 13px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mt { margin-top: 12px; }
+  .chips { display: flex; gap: 8px; padding: 4px 0 12px; overflow-x: auto; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { display: flex; align-items: center; gap: 7px; padding: 4px 12px 4px 4px; border-radius: 16px; background: rgba(255, 255, 255, .7); border: 1px solid var(--hair); cursor: pointer; flex: none; white-space: nowrap; }
+  .chip .av { width: 28px; height: 28px; border-radius: 11px; color: #fff; font-size: 12px; display: grid; place-items: center; background: #8ab4c9; flex: none; }
+  .chip span { font-size: 12px; color: var(--muted); }
+  .chip.on { background: #fff; border-color: rgba(255, 79, 123, .35); box-shadow: 0 4px 12px rgba(255, 79, 123, .12); }
+  .chip.on .av { background: var(--rose); }
+  .chip.on span { color: var(--rose); font-weight: 500; }
+  .chip.add { padding: 4px 10px; color: var(--purple); font-size: 15px; background: var(--lav); border-color: transparent; }
+  .stagecard { padding: 15px 16px; }
+  .stagecard .st { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .stagecard strong { font-family: var(--f-serif); font-size: 17px; font-weight: 500; letter-spacing: .01em; }
+  .stagecard p { margin: 8px 0 0; font-size: 11.5px; color: var(--muted); line-height: 1.75; }
+  .up { color: var(--up); }
+  .down { color: var(--down); }
+  .flat { color: var(--flat); }
+  .tr { font-size: 11px; font-weight: 500; white-space: nowrap; }
+  .dims { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .dim { padding: 13px 14px 15px; cursor: pointer; }
+  .dimhead { display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; color: var(--muted); }
+  .dimhead i { font-style: normal; font-size: 13px; font-weight: 600; }
+  .num { font-family: var(--f-num); font-size: 23px; font-weight: 600; letter-spacing: -.035em; margin-top: 6px; line-height: 1.05; font-variant-numeric: tabular-nums; }
+  .num small { font-size: 11px; font-weight: 500; color: var(--muted); margin-left: 2px; letter-spacing: 0; }
+  .bar { height: 3px; border-radius: 3px; background: rgba(28, 27, 34, .07); margin-top: 10px; overflow: hidden; }
+  .bar i { display: block; height: 100%; border-radius: 3px; background: var(--rose); }
+  .bar.p i { background: var(--purple); }
+  .boundary { display: flex; align-items: center; gap: 8px; padding: 11px 14px; border-radius: var(--r-s); background: rgba(20, 165, 124, .08); font-size: 11.5px; color: #2f6d5b; line-height: 1.6; }
+  .boundary em { width: 6px; height: 6px; border-radius: 50%; background: var(--good); flex: none; }
+  .boundary.alert { background: rgba(193, 102, 63, .10); color: #8a4f2d; }
+  .boundary.alert em { background: var(--warn); }
+  .next { padding: 15px 16px 14px; background: rgba(255, 255, 255, .82); border: 1px solid rgba(255, 255, 255, .9); border-radius: var(--r); box-shadow: 0 12px 28px rgba(38, 24, 64, .08); }
+  .next small { font-size: 11.5px; color: var(--good); font-weight: 500; }
+  .next small.warn { color: var(--warn); }
+  .next p { margin: 7px 0 0; font-size: 13px; line-height: 1.7; }
+  .next a { display: inline-block; margin-top: 10px; font-size: 11.5px; color: var(--purple); text-decoration: none; font-weight: 500; cursor: pointer; }
+  .fold { display: flex; justify-content: space-between; align-items: center; padding: 12px 2px; font-size: 11.5px; color: var(--muted); cursor: pointer; }
+  .fold + .fold { border-top: 1px solid var(--hair); }
+  .fold .cnt { color: var(--faint); font-family: var(--f-num); }
+  .foldbody { font-size: 11.5px; color: var(--muted); line-height: 1.8; padding: 2px 2px 12px; display: none; }
+  .foldbody.on { display: block; }
+  .hello { padding: 2px 2px 14px; }
+  .hello small { font-size: 11px; color: var(--muted); }
+  .hello strong { display: block; font-family: var(--f-serif); font-size: 21px; font-weight: 500; margin-top: 4px; letter-spacing: .01em; }
+  .chartcard { padding: 15px 15px 13px; }
+  .charthead { display: flex; justify-content: space-between; align-items: baseline; }
+  .charthead b { font-size: 12.5px; font-weight: 500; }
+  .charthead span { font-size: 10.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .chart { display: block; width: 100%; height: auto; margin-top: 8px; overflow: visible; }
+  .xaxis { display: flex; justify-content: space-between; font-family: var(--f-num); font-size: 9.5px; color: var(--faint); margin-top: 3px; font-variant-numeric: tabular-nums; }
+  .tleg { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 12px; margin-top: 9px; padding-top: 9px; border-top: 1px solid var(--hair); }
+  .tleg span { display: flex; align-items: center; gap: 6px; font-size: 10.5px; color: var(--muted); }
+  .tleg em { width: 6px; height: 6px; border-radius: 50%; flex: none; }
+  .tleg u { margin-left: auto; text-decoration: none; font-family: var(--f-num); font-size: 11.5px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .note { margin-top: 8px; font-size: 9.5px; color: var(--faint); line-height: 1.55; }
+  .seclabel { display: flex; justify-content: space-between; align-items: baseline; padding: 0 2px 8px; font-size: 11px; color: var(--muted); }
+  .seclabel b { font-size: 11px; font-weight: 500; color: var(--ink); }
+  .plist { display: grid; gap: 8px; }
+  .prow { display: flex; align-items: center; gap: 10px; padding: 11px 13px; cursor: pointer; }
+  .prow .av { width: 34px; height: 34px; border-radius: 12px; color: #fff; font-size: 13px; display: grid; place-items: center; flex: none; }
+  .prow .who b { display: block; font-size: 12.5px; font-weight: 500; }
+  .prow .who span { font-size: 10.5px; color: var(--muted); }
+  .prow .go { margin-left: auto; font-size: 11px; color: var(--faint); }
+  .dock { position: absolute; left: 16px; right: 16px; bottom: 12px; height: 60px; border-radius: 30px; background: rgba(255, 255, 255, .55); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%); border: 1px solid rgba(255, 255, 255, .75); box-shadow: 0 12px 30px rgba(38, 24, 64, .14), inset 0 1px 0 rgba(255, 255, 255, .7); display: flex; align-items: center; justify-content: space-around; padding: 0 10px; z-index: 4; }
+  .dock.hide { display: none; }
+  .dock span { font-size: 11px; color: #a49caf; cursor: pointer; }
+  .dock span.on { color: var(--purple); font-weight: 500; }
+  .dock .center { text-align: center; margin-top: -12px; }
+  .dock .center i { width: 46px; height: 46px; border-radius: 17px; background: linear-gradient(145deg, #ff7396 0%, #a97ae6 100%); color: #fff; display: grid; place-items: center; font-size: 17px; font-weight: 700; font-style: normal; box-shadow: 0 10px 24px rgba(168, 124, 232, .32), inset 0 1px 0 rgba(255, 255, 255, .35); cursor: pointer; }
+  .dock .center span { display: block; margin-top: 3px; color: var(--purple); font-weight: 500; font-size: 11px; }
+  .field { margin-bottom: 12px; }
+  .field label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  .input, .area { width: 100%; font-family: inherit; font-size: 12.5px; color: var(--ink); background: rgba(255, 255, 255, .8); border: 1px solid var(--hair); border-radius: 14px; padding: 12px 13px; outline: none; line-height: 1.7; }
+  .input:focus, .area:focus { border-color: rgba(108, 76, 224, .35); box-shadow: 0 0 0 3px rgba(108, 76, 224, .08); }
+  .area { height: 172px; resize: none; }
+  .privacy { display: flex; gap: 9px; align-items: flex-start; background: rgba(108, 76, 224, .06); color: #6c6480; font-size: 11px; line-height: 1.65; border-radius: 14px; padding: 11px 12px; }
+  .privacy span { color: var(--purple); font-size: 14px; line-height: 1.2; }
+  .bubble { background: #fff; border-radius: 16px 16px 16px 5px; padding: 11px 14px; font-size: 12.5px; line-height: 1.7; border: 1px solid var(--hair); }
+  .bubble.me { background: var(--rose); color: #fff; border: 0; border-radius: 16px 16px 5px 16px; }
+  .cand { padding: 14px 15px; margin-bottom: 10px; }
+  .cand .txt { font-size: 13px; line-height: 1.75; }
+  .cand .meta { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 10.5px; color: var(--muted); }
+  .cand .meta .copy { margin-left: auto; color: var(--purple); font-weight: 500; cursor: pointer; }
+  .cand.skip { opacity: .62; border-style: dashed; }
+  .cand .tag { font-size: 10px; padding: 2px 7px; border-radius: 6px; background: rgba(193, 102, 63, .12); color: var(--warn); font-weight: 500; }
+  .cand .tag.ok { background: rgba(20, 165, 124, .12); color: var(--good); }
+  .welcome { display: flex; flex-direction: column; justify-content: center; min-height: 600px; padding: 0 8px; }
+  .logo { width: 58px; height: 58px; border-radius: 20px; background: linear-gradient(145deg, #ff7396, #a97ae6); color: #fff; display: grid; place-items: center; font-size: 26px; box-shadow: 0 14px 30px rgba(168, 124, 232, .32); }
+  .welcome h1 { font-family: var(--f-serif); font-size: 30px; font-weight: 500; margin: 20px 0 8px; letter-spacing: .02em; }
+  .welcome > p { font-size: 12.5px; color: var(--muted); line-height: 1.8; margin: 0; }
+  .pts { list-style: none; padding: 0; margin: 20px 0 0; }
+  .pts li { font-size: 12px; color: #5d5769; line-height: 2.1; display: flex; gap: 8px; align-items: center; }
+  .pts li:before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--rose); flex: none; }
+  .agree { display: flex; gap: 8px; align-items: flex-start; font-size: 11px; color: var(--muted); line-height: 1.65; margin: 22px 0 14px; cursor: pointer; }
+  .agree input { margin: 2px 0 0; accent-color: var(--rose); flex: none; }
+  .tiny { font-size: 10.5px; color: var(--faint); text-align: center; margin: 12px 0 0; }
+  .rows { padding: 2px 0; }
+  .rowitem { display: flex; align-items: center; gap: 10px; padding: 13px 2px; font-size: 12.5px; }
+  .rowitem + .rowitem { border-top: 1px solid var(--hair); }
+  .rowitem .go { margin-left: auto; color: var(--faint); font-size: 11px; }
+  .rowitem.danger { color: #c0553c; }
+  .tpl { padding: 12px 14px; margin-bottom: 9px; }
+  .tpl .t { font-size: 12.5px; line-height: 1.7; }
+  .tpl .m { display: flex; gap: 8px; margin-top: 8px; font-size: 10px; color: var(--muted); }
+  .tpl .m i { font-style: normal; background: rgba(108, 76, 224, .08); color: var(--purple); padding: 2px 7px; border-radius: 6px; }
+  .tabs { display: flex; gap: 6px; background: rgba(28, 27, 34, .05); padding: 4px; border-radius: 14px; margin-bottom: 12px; }
+  .tabs div { flex: 1; text-align: center; font-size: 12px; padding: 8px 0; border-radius: 11px; color: var(--muted); cursor: pointer; }
+  .tabs div.on { background: #fff; color: var(--ink); font-weight: 500; box-shadow: 0 2px 6px rgba(38, 24, 64, .08); }
+  .shots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .shot { position: relative; border-radius: 12px; overflow: hidden; background: #ededed; border: 1px solid var(--hair); }
+  .shot .hd { height: 15px; background: #f7f7f7; border-bottom: 1px solid #e6e6e6; display: grid; place-items: center; font-size: 6px; color: #b3b3b3; letter-spacing: .04em; }
+  .shot .bd { padding: 5px 4px 8px; display: flex; flex-direction: column; gap: 3px; min-height: 92px; }
+  .shot .b { height: 8px; border-radius: 4px; background: #fff; }
+  .shot .b.me { background: #95ec69; align-self: flex-end; }
+  .shot .b.s { width: 62%; }
+  .shot .x { position: absolute; top: 4px; right: 4px; width: 15px; height: 15px; border-radius: 50%; background: rgba(0, 0, 0, .45); color: #fff; font-size: 9px; display: grid; place-items: center; cursor: pointer; }
+  .shot.add { display: grid; place-items: center; background: rgba(108, 76, 224, .06); border: 1px dashed rgba(108, 76, 224, .32); color: var(--purple); font-size: 19px; min-height: 110px; cursor: pointer; }
+  .ocrrow { display: flex; align-items: flex-start; gap: 9px; padding: 11px 0; border-bottom: 1px solid var(--hair); }
+  .ocrrow:last-child { border-bottom: 0; }
+  .who { flex: none; font-size: 10px; padding: 3px 8px; border-radius: 8px; background: rgba(108, 76, 224, .10); color: var(--purple); cursor: pointer; margin-top: 1px; }
+  .who.me { background: rgba(255, 79, 123, .12); color: var(--rose); }
+  .ocrrow .t { font-size: 12px; line-height: 1.65; }
+  .crop { background: #eeeeee; border-radius: 10px; padding: 10px 10px 11px; margin-top: 12px; }
+  .crop .lbl { font-size: 9.5px; color: #9a94a4; margin-bottom: 7px; }
+  .crop .cb { background: #fff; border-radius: 6px; padding: 7px 9px; font-size: 11.5px; line-height: 1.6; max-width: 90%; }
+  .crop .ts { font-size: 9px; color: #b3b0ba; text-align: center; margin-top: 8px; }
+  .sheet { position: absolute; inset: 0; background: rgba(24, 20, 32, .32); display: none; align-items: flex-end; z-index: 20; backdrop-filter: blur(3px); }
+  .sheet.on { display: flex; }
+  .sheetbox { width: 100%; background: #fff; border-radius: 26px 26px 0 0; padding: 20px 22px 26px; transform: translateY(100%); transition: transform .26s cubic-bezier(.3,.8,.3,1); }
+  .sheet.on .sheetbox { transform: none; }
+  .sheetbox .k { display: flex; justify-content: space-between; align-items: baseline; }
+  .sheetbox .k b { font-size: 13px; font-weight: 500; }
+  .sheetbox .k span { font-family: var(--f-num); font-size: 19px; font-weight: 600; }
+  .sheetbox .k em { font-style: normal; font-size: 11px; color: var(--muted); margin-left: 6px; }
+  .sheetbox p { font-size: 12px; color: #5d5769; line-height: 1.8; margin: 12px 0 0; }
+  .sheetbox .src { margin-top: 14px; font-size: 11px; color: var(--muted); background: #f7f5fa; border-radius: 12px; padding: 10px 12px; line-height: 1.7; }
+  .toast { position: fixed; left: 50%; bottom: 120px; transform: translate(-50%, 12px); background: rgba(28, 27, 34, .88); color: #fff; font-size: 12px; padding: 9px 16px; border-radius: 20px; opacity: 0; pointer-events: none; transition: all .22s ease; z-index: 90; }
+  .toast.on { opacity: 1; transform: translate(-50%, 0); }
+  .hint { position: fixed; left: 22px; bottom: 22px; width: 190px; font-size: 10.5px; color: #8b8496; line-height: 1.9; }
+  .hint b { display: block; color: #4b4558; font-size: 11px; font-weight: 500; margin-bottom: 4px; }
+  .hint span { display: block; }
+  @media (max-width: 980px) { .hint { display: none; } }
+  @media (max-width: 520px) { .stage { padding: 0; } .app { width: 100%; height: 100vh; height: 100dvh; border: 0; border-radius: 0; } .sbar { display: none; } .view { padding-top: 14px; } .welcome { min-height: 78vh; } }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="app">
+    <div class="sbar"><span>9:41</span><span>5G</span></div>
+    <div class="view" id="view"></div>
+    <nav class="dock hide" id="dock">
+      <span data-go="home" data-tab="home">首页</span>
+      <span data-go="import" data-tab="import">分析</span>
+      <div class="center" data-go="panel"><i>攻</i><span>攻略</span></div>
+      <span data-go="templates" data-tab="templates">模板</span>
+      <span data-go="me" data-tab="me">我的</span>
+    </nav>
+    <div class="sheet" id="sheet"><div class="sheetbox" id="sheetbox"></div></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="hint">
+  <b>可以试着点</b>
+  <span>· 首页的温度曲线</span>
+  <span>· 攻略面板任意一格看依据</span>
+  <span>· 中间「攻」一键直达</span>
+  <span>· 分析 → 截图识别 → 改谁说的</span>
+  <span>· 分析页底部「边界场景」</span>
+</div>
+<script>
+function lsGet(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+
+const D = {
+  screen: 'welcome',
+  current: 'linxia',
+  sampleMode: 'normal',
+  importTab: 'shot',
+  ocrMode: null,
+  ocrRows: [],
+  apiKey: lsGet('mly_api_key'),
+  tones: ['温柔', '幽默', '真诚', '克制']
+};
+
+const PEOPLE = {
+  linxia: {
+    id: 'linxia', name: '林夏', av: '夏', color: '#ff4f7b',
+    meta: '认识 46 天 · 同城 · 电影爱好者',
+    stage: '暧昧升温', prevStage: '熟悉建立',
+    dims: { fam: 72, heat: 66, comf: 81, off: 38 },
+    prev: { fam: 69, heat: 61, comf: 79, off: 42 },
+    ev: {
+      fam: { text: '她连续三次主动补充电影细节，也提到过家里的猫。', src: '10 月 23 日 22:14 ·「那个导演的片我基本都看」' },
+      heat: { text: '她主动开启话题 3 次，上周 1 次。', src: '本周一、三、五均为她先发消息' },
+      comf: { text: '她会用「哈哈」这类轻松应答，也愿意说自己累。', src: '10 月 24 日 ·「今天累死了，不想动」' },
+      off: { text: '她提过「周末好像还有重映」，但没接住邀约。', src: '10 月 22 日 ·「周末好像还有重映」→ 之后未再提' }
+    },
+    next: '她提了重映却没接住。给一个容易拒绝的选择，把决定权留给她。',
+    nextWarn: '',
+    info: '电影 · 猫 · 忌熬夜',
+    timeline: ['她分享了周末看的电影 · 昨天 · 分析确认', '第一次聊到喜欢的导演 · 10 月 18 日 · 你记录', '建立人物档案 · 9 月 9 日'],
+    history: [
+      { d: '9/26', fam: 55, heat: 40, comf: 62, off: 30 },
+      { d: '10/1', fam: 58, heat: 48, comf: 68, off: 34 },
+      { d: '10/7', fam: 63, heat: 52, comf: 73, off: 36 },
+      { d: '10/13', fam: 66, heat: 58, comf: 76, off: 40 },
+      { d: '10/19', fam: 69, heat: 61, comf: 79, off: 42 },
+      { d: '10/25', fam: 72, heat: 66, comf: 81, off: 38 }
+    ],
+    last: '周末好像还有重映，不过我这周有点累',
+    replies: [
+      { tag: 'ok', tagText: '可以用', text: '那就别硬撑了，先补觉。重映跑不掉，等你这周缓过来我再问你还想不想去。', meta: '真诚 · 把决定权给她', good: true },
+      { tag: 'ok', tagText: '可以用', text: '累了就先歇着，我记着这部片。你哪天想出门了说一声，我配合你时间。', meta: '克制 · 不追问', good: true },
+      { tag: 'skip', tagText: '这条先别发', text: '那正好，周六我订了两张票，你休息好我们直接去。', meta: '越界 · 她说了累，你还替她定时间', good: false }
+    ]
+  },
+  anran: {
+    id: 'anran', name: '安然', av: '安', color: '#e0a86c',
+    meta: '认识 12 天 · 同事朋友 · 健身',
+    stage: '熟悉建立', prevStage: '初识破冰',
+    dims: { fam: 54, heat: 42, comf: 61, off: 25 },
+    prev: { fam: 52, heat: 44, comf: 60, off: 26 },
+    ev: {
+      fam: { text: '聊过两次工作和健身习惯，信息量还不深。', src: '10 月 21 日 · 互换了常去的健身房' },
+      heat: { text: '这周她主动发了 1 次，上周 2 次。', src: '10 月 20 日之后由你先开口' },
+      comf: { text: '回复速度稳定，但没有玩笑或自嘲。', src: '平均间隔 40 分钟，无表情包' },
+      off: { text: '还没出现任何线下场景的暗示。', src: '暂无相关原文' }
+    },
+    next: '还在互相试探。别急着约，先找一个她愿意多说两句的话题。',
+    nextWarn: '',
+    info: '健身 · 咖啡 · 早起',
+    timeline: ['聊到常去的健身房 · 10 月 21 日 · 分析确认', '加好友 · 10 月 13 日'],
+    history: [
+      { d: '9/30', fam: 30, heat: 30, comf: 48, off: 18 },
+      { d: '10/8', fam: 38, heat: 36, comf: 54, off: 20 },
+      { d: '10/15', fam: 45, heat: 40, comf: 58, off: 22 },
+      { d: '10/21', fam: 52, heat: 44, comf: 60, off: 26 },
+      { d: '10/25', fam: 54, heat: 42, comf: 61, off: 25 }
+    ],
+    last: '今天练腿，明天大概下不了楼',
+    replies: [
+      { tag: 'ok', tagText: '可以用', text: '那明天电梯就是你的救命恩人。记得拉伸，别硬扛。', meta: '幽默 · 轻，不追问', good: true },
+      { tag: 'ok', tagText: '可以用', text: '练腿第二天最难受，热水泡一下会好点。你一般练完怎么恢复？', meta: '真诚 · 留了个话头', good: true },
+      { tag: 'skip', tagText: '这条先别发', text: '那我明天去接你下班吧，正好扶你下楼。', meta: '越界 · 认识 12 天，接下班太重', good: false }
+    ]
+  }
+};
+
+const BOUNDARY_PERSON = {
+  id: 'demo', name: '边界示例', av: '例', color: '#8ab4c9',
+  meta: '用于演示拒绝信号', stage: '需要空间', prevStage: '暧昧升温',
+  dims: { fam: 61, heat: 34, comf: 48, off: 12 },
+  prev: { fam: 64, heat: 58, comf: 62, off: 40 },
+  ev: {
+    fam: { text: '仍然聊得动，但她开始缩短回复。', src: '「嗯」「好的」各 3 次' },
+    heat: { text: '这周她主动 0 次，上周 4 次。', src: '10 月 20 日之后全部由你先开口' },
+    comf: { text: '她两次把话题收掉。', src: '「先这样吧」「改天聊」' },
+    off: { text: '她明确说过「改天吧」。', src: '10 月 24 日 ·「这周不太行，改天吧」' }
+  },
+  next: '她说过「改天吧」。别再提约，先让节奏松下来。',
+  nextWarn: '1',
+  info: '—',
+  timeline: ['她说「改天吧」· 10 月 24 日 · 分析确认'],
+  history: [
+    { d: '10/5', fam: 58, heat: 52, comf: 60, off: 34 },
+    { d: '10/12', fam: 62, heat: 58, comf: 62, off: 40 },
+    { d: '10/18', fam: 64, heat: 50, comf: 56, off: 36 },
+    { d: '10/24', fam: 61, heat: 34, comf: 48, off: 12 }
+  ],
+  last: '这周不太行，改天吧',
+  replies: [
+    { tag: 'ok', tagText: '可以用', text: '行，你先忙。等你有空了我们再说。', meta: '克制 · 接住了她的拒绝', good: true },
+    { tag: 'ok', tagText: '可以用', text: '好，那我不催你了。最近忙完记得歇会儿。', meta: '真诚 · 不追加邀约', good: true },
+    { tag: 'skip', tagText: '这条先别发', text: '那下周六呢？下周六总可以吧。', meta: '越界 · 把「改天吧」当成可以再问', good: false }
+  ]
+};
+
+const TEMPLATES = [
+  { s: '初识', t: '你提到的那家店我也路过过，不过一直没进去。值得排一次队吗？', tags: ['提问', '低压力'] },
+  { s: '初识', t: '看你朋友圈那张照片，是在哪拍的？光线挺好看。', tags: ['自然开场'] },
+  { s: '暧昧', t: '刚看到一部片，第一反应是你要是在应该会喜欢。', tags: ['暗示', '不追问'] },
+  { s: '暧昧', t: '今天有点累，跟你聊两句反而松下来了。', tags: ['示弱', '真诚'] },
+  { s: '冲突', t: '我说话可能有点急，让你不舒服了。我想听你怎么想。', tags: ['道歉', '不辩解'] },
+  { s: '冲突', t: '我们现在像是在说两件不同的事，要不先停一下。', tags: ['降温'] },
+  { s: '边界', t: '好，我记住了。那我不提这事了，你需要空间就说。', tags: ['尊重拒绝'] },
+  { s: '边界', t: '收到，不勉强。等你方便了再聊。', tags: ['不追加'] }
+];
+
+const SIGNALS = [
+  '她主动开启话题 3 次（上周 1 次）',
+  '她两次补充了你没问的细节',
+  '她提到「这周有点累」，但没有拒绝聊天',
+  '你提到重映之后，她没有接这个话头'
+];
+
+function trend(cur, prev) {
+  const d = cur - prev;
+  if (d > 2) return { c: 'up', s: '↑', d: d };
+  if (d < -2) return { c: 'down', s: '↓', d: d };
+  return { c: 'flat', s: '—', d: d };
+}
+
+function person() {
+  if (D.sampleMode === 'boundary' && D.screen === 'analysis') return BOUNDARY_PERSON;
+  if (D.sampleMode === 'boundary' && D.screen === 'reply') return BOUNDARY_PERSON;
+  return PEOPLE[D.current];
+}
+
+function counts(p) {
+  let u = 0, f = 0, dn = 0;
+  ['fam', 'heat', 'comf', 'off'].forEach(function (k) {
+    const t = trend(p.dims[k], p.prev[k]);
+    if (t.c === 'up') u++; else if (t.c === 'down') dn++; else f++;
+  });
+  return u + ' 升 · ' + f + ' 平 · ' + dn + ' 降';
+}
+
+function chart(p) {
+  const h = p.history;
+  const W = 300, T = 8, B = 88, L = 6, R = 6;
+  const min = 15, max = 95;
+  const x = function (i) { return L + i * (W - L - R) / (h.length - 1); };
+  const y = function (v) { return B - (v - min) / (max - min) * (B - T); };
+  const ser = [
+    { k: 'fam', c: '#ff4f7b' },
+    { k: 'heat', c: '#6c4ce0' },
+    { k: 'comf', c: '#f2994a' },
+    { k: 'off', c: '#2aa8a0' }
+  ];
+  let out = '<svg class="chart" viewBox="0 0 300 96" xmlns="http://www.w3.org/2000/svg">';
+  out += '<line x1="' + L + '" y1="' + (B + 2) + '" x2="' + (W - R) + '" y2="' + (B + 2) + '" stroke="rgba(28,27,34,.08)" stroke-width="1"/>';
+  ser.forEach(function (s) {
+    const d = h.map(function (row, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(row[s.k]).toFixed(1); }).join(' ');
+    out += '<path d="' + d + '" fill="none" stroke="' + s.c + '" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>';
+  });
+  ser.forEach(function (s) {
+    const last = h[h.length - 1];
+    out += '<circle cx="' + x(h.length - 1).toFixed(1) + '" cy="' + y(last[s.k]).toFixed(1) + '" r="3" fill="#fff" stroke="' + s.c + '" stroke-width="1.9"/>';
+  });
+  out += '</svg>';
+  return out;
+}
+
+function homeScreen() {
+  const p = PEOPLE[D.current];
+  const leg = [
+    ['#ff4f7b', '熟悉度', p.dims.fam],
+    ['#6c4ce0', '互动热度', p.dims.heat],
+    ['#f2994a', '舒适度', p.dims.comf],
+    ['#2aa8a0', '线下推进', p.dims.off]
+  ].map(function (a) {
+    return '<span><em style="background:' + a[0] + '"></em>' + a[1] + '<u>' + a[2] + '</u></span>';
+  }).join('');
+  return '<div class="screen enter">' +
+    '<div class="hello"><small>10 月 25 日 周日</small><strong>晚上好</strong></div>' +
+    '<div class="card chartcard">' +
+      '<div class="charthead"><b>近 30 天温度</b><span>' + counts(p) + '</span></div>' +
+      chart(p) +
+      '<div class="xaxis"><span>' + p.history[0].d + '</span><span>' + p.history[3].d + '</span><span>今天</span></div>' +
+      '<div class="tleg">' + leg + '</div>' +
+      '<div class="note">只画做过分析的日子，没分析的天不补点。</div>' +
+    '</div>' +
+    '<div style="height:16px"></div>' +
+    '<div class="seclabel"><b>你的对象</b><span>2 个</span></div>' +
+    '<div class="plist">' +
+      '<div class="card prow" data-person="linxia"><div class="av" style="background:#ff4f7b">夏</div><div class="who"><b>林夏</b><span>暧昧升温 · 今天分析过</span></div><div class="go">›</div></div>' +
+      '<div class="card prow" data-person="anran"><div class="av" style="background:#e0a86c">安</div><div class="who"><b>安然</b><span>熟悉建立 · 3 天前</span></div><div class="go">›</div></div>' +
+    '</div>' +
+    '<div style="height:14px"></div>' +
+    '<div class="next"><small>今天该做的</small><p>' + p.next + '</p><a data-go="reply">去看回复建议 ›</a></div>' +
+  '</div>';
+}
+
+function panelScreen() {
+  const p = PEOPLE[D.current];
+  const dims = [
+    ['熟悉度', 'fam', ''],
+    ['互动热度', 'heat', ''],
+    ['舒适度', 'comf', ' p'],
+    ['线下推进', 'off', ' p']
+  ].map(function (d) {
+    const t = trend(p.dims[d[1]], p.prev[d[1]]);
+    return '<div class="card dim" data-dim="' + d[1] + '">' +
+      '<div class="dimhead"><span>' + d[0] + '</span><i class="' + t.c + '">' + t.s + '</i></div>' +
+      '<div class="num">' + p.dims[d[1]] + '<small>%</small></div>' +
+      '<div class="bar' + d[2] + '"><i style="width:' + p.dims[d[1]] + '%"></i></div>' +
+    '</div>';
+  }).join('');
+  const t = trend(p.dims.heat, p.prev.heat);
+  return '<div class="screen enter">' +
+    '<div class="chips">' +
+      '<div class="chip on"><div class="av" style="background:#ff4f7b">夏</div><span>林夏</span></div>' +
+      '<div class="chip" data-person="anran"><div class="av" style="background:#8ab4c9">安</div><span>安然</span></div>' +
+      '<div class="chip add" data-go="new">+</div>' +
+    '</div>' +
+    '<div class="card stagecard">' +
+      '<div class="st"><strong>' + p.stage + '</strong><span class="tr ' + t.c + '">' + t.s + ' 比上周更主动</span></div>' +
+      '<p>她主动开启话题 3 次，上周 1 次；愿意聊到深夜。</p>' +
+    '</div>' +
+    '<div style="height:12px"></div>' +
+    '<div class="dims">' + dims + '</div>' +
+    '<div style="height:12px"></div>' +
+    '<div class="boundary"><em></em><span>边界检查：未发现回避或拒绝信号</span></div>' +
+    '<div style="height:12px"></div>' +
+    '<div class="next"><small>下一步</small><p>' + p.next + '</p><a data-go="reply">去看回复建议 ›</a></div>' +
+    '<div style="height:8px"></div>' +
+    '<div class="fold" data-fold="info"><span>关键信息 · ' + p.info + '</span><span class="cnt">›</span></div>' +
+    '<div class="foldbody" id="fold-info">她喜欢老片重映，养了只橘猫，熬不了夜。家里催过相亲，但她说想自己来。</div>' +
+    '<div class="fold" data-fold="time"><span>时间线 · 近 30 天 ' + p.timeline.length + ' 条</span><span class="cnt">›</span></div>' +
+    '<div class="foldbody" id="fold-time">' + p.timeline.join('<br>') + '</div>' +
+  '</div>';
+}
+
+function importScreen() {
+  const tabs = '<div class="tabs">' +
+    '<div class="' + (D.importTab === 'shot' ? 'on' : '') + '" data-tab2="shot">截图识别</div>' +
+    '<div class="' + (D.importTab === 'paste' ? 'on' : '') + '" data-tab2="paste">粘贴文本</div>' +
+  '</div>';
+  const demo = '<p class="tiny" style="margin-top:16px">演示用：<span style="color:var(--purple);cursor:pointer" id="fill-normal">普通场景</span> · <span style="color:var(--purple);cursor:pointer" id="fill-boundary">边界场景</span></p>';
+
+  if (D.importTab === 'paste') {
+    const sample = D.sampleMode === 'boundary'
+      ? '我：周六有空吗，一起吃饭\n她：这周不太行\n我：那周日呢\n她：也不太想出门\n我：是不是我太急了\n她：不是，就是有点累\n她：改天吧'
+      : '她：周末好像还有重映\n我：是吗，哪个影院\n她：就那个老片，我有点想看但懒得动\n我：那改天？\n她：嗯，再看吧\n我：最近在忙什么\n她：有点累，工作压得慌';
+    return '<div class="screen enter">' +
+      '<div class="topbar"><button class="back" data-go="home">‹</button><span class="tt">导入聊天</span></div>' +
+      tabs +
+      '<div class="card" style="padding:14px 15px">' +
+        '<div class="field" style="margin:0"><label>聊天内容（一行一条，开头标「我：」或「她：」）</label>' +
+        '<textarea class="area" id="chattext">' + sample + '</textarea></div>' +
+      '</div>' +
+      '<div style="height:12px"></div>' +
+      '<div class="privacy"><span>✦</span><div>聊天内容只用于这次分析。原始文本分析完默认删除，保留与否由你决定。</div></div>' +
+      '<div style="height:14px"></div>' +
+      '<button class="btn primary" id="do-analyze">开始分析</button>' +
+      demo +
+      '<p class="tiny">粘贴是保底方案。微信只能单条复制，30 条就要复制 30 次——所以才要做截图识别。</p>' +
+    '</div>';
+  }
+
+  const shots = [0, 1, 2].map(function (i) {
+    return '<div class="shot"><div class="hd">林夏</div><div class="bd">' +
+      '<div class="b s"></div><div class="b me"></div><div class="b"></div><div class="b s me"></div><div class="b"></div>' +
+      '</div><div class="x" data-del="' + i + '">×</div></div>';
+  }).join('');
+  return '<div class="screen enter">' +
+    '<div class="topbar"><button class="back" data-go="home">‹</button><span class="tt">导入聊天</span></div>' +
+    tabs +
+    '<div class="card" style="padding:14px 15px">' +
+      '<div class="seclabel" style="padding-bottom:8px"><b>选择截图</b><span>3 / 20 张</span></div>' +
+      '<div class="shots">' + shots + '<div class="shot add" data-add="1">＋</div></div>' +
+      '<div class="note" style="margin-top:10px">连续截图会重叠，识别时自动去重。顺序按截图里的时间戳排，不靠文件名。</div>' +
+    '</div>' +
+    '<div style="height:12px"></div>' +
+    '<div class="privacy"><span>✦</span><div>截图里常有对方的头像、昵称和别人发来的消息。识别前请先确认图里没有不该给我的东西——<b>识别全程在本机完成，图片不出设备</b>。</div></div>' +
+    '<div style="height:14px"></div>' +
+    '<button class="btn primary" id="do-ocr">开始识别</button>' +
+    demo +
+    '<p class="tiny">识别完会让你逐行确认"谁说的"。这一屏不能省——把对方的话认成你说的，整张面板就反了。</p>' +
+  '</div>';
+}
+
+function ensureOcr() {
+  if (D.ocrMode === D.sampleMode) return;
+  const base = D.sampleMode === 'boundary'
+    ? [[true, '周六有空吗，一起吃饭'], [false, '这周不太行'], [true, '那周日呢'], [false, '也不太想出门'], [true, '是不是我太急了'], [false, '不是，就是有点累'], [false, '改天吧']]
+    : [[false, '周末好像还有重映'], [true, '是吗，哪个影院'], [false, '就那个老片，我有点想看但懒得动'], [true, '那改天？'], [false, '嗯，再看吧'], [true, '最近在忙什么'], [false, '有点累，工作压得慌']];
+  D.ocrRows = base.map(function (r) { return { me: r[0], t: r[1] }; });
+  D.ocrMode = D.sampleMode;
+}
+
+function ocrScreen() {
+  ensureOcr();
+  const rows = D.ocrRows.map(function (r, i) {
+    return '<div class="ocrrow"><span class="who ' + (r.me ? 'me' : '') + '" data-ocr="' + i + '">' + (r.me ? '我' : '对方') + '</span>' +
+      '<div class="t">' + r.t + '</div></div>';
+  }).join('');
+  const mine = D.ocrRows.filter(function (r) { return r.me; }).length;
+  return '<div class="screen enter">' +
+    '<div class="topbar"><button class="back" data-go="import">‹</button><span class="tt">确认谁说的</span></div>' +
+    '<div class="card" style="padding:14px 15px">' +
+      '<div class="seclabel" style="padding-bottom:4px"><b>识别出 ' + D.ocrRows.length + ' 条</b><span>你 ' + mine + ' · 对方 ' + (D.ocrRows.length - mine) + '</span></div>' +
+      '<div class="note" style="margin:0 0 4px">点左边的「我 / 对方」可以改。改错一条，结论就可能反。</div>' +
+      rows +
+    '</div>' +
+    '<div style="height:12px"></div>' +
+    '<div class="boundary"><em></em><span>识别全程在本机。原图分析完即删，只保留被引用的那一小块。</span></div>' +
+    '<div style="height:14px"></div>' +
+    '<button class="btn primary" id="do-analyze">确认，开始分析</button>' +
+    '<p class="tiny">点任意一条「依据」，看到的将是原图裁剪块，不是识别出来的文字。</p>' +
+  '</div>';
+}
+
+function analysisScreen() {
+  const p = person();
+  const alert = p.id === 'demo';
+  return '<div class="screen enter">' +
+    '<div class="topbar"><button class="back" data-go="import">‹</button><span class="tt">分析结果</span></div>' +
+    '<div class="card" style="padding:15px 16px">' +
+      '<div class="seclabel" style="padding-bottom:6px"><b>看到的信号</b><span>4 条</span></div>' +
+      (alert
+        ? '<div class="sub" style="margin:0">她这周主动 0 次（上周 4 次）；两次把话题收掉；明确说过「改天吧」。<br>整体在退，不是你在想多了。</div>'
+        : '<div class="sub" style="margin:0">她主动开启话题 3 次（上周 1 次）；两次补充了你没问的细节；提到累但没拒绝聊天；你提重映，她没接。</div>') +
+    '</div>' +
+    '<div style="height:12px"></div>' +
+    '<div class="card stagecard">' +
+      '<div class="st"><strong>' + p.stage + '</strong><span class="tr ' + (alert ? 'down' : 'up') + '">' + (alert ? '↓ 在退' : '↑ 在升温') + '</span></div>' +
+      '<p>' + (alert ? '从「暧昧升温」退到「需要空间」。一个拒绝信号就够降级。' : '从「熟悉建立」进到「暧昧升温」。进阶段需要多个信号同时成立。') + '</p>' +
+    '</div>' +
+    '<div style="height:12px"></div>' +
+    '<div class="boundary ' + (alert ? 'alert' : '') + '"><em></em><span>' +
+      (alert ? '边界检查：检出明确拒绝（「改天吧」）。邀约类模板已停用，下面的建议整体切换为「暂不推进」。' : '边界检查：未发现回避或拒绝信号。') +
+    '</span></div>' +
+    '<div style="height:14px"></div>' +
+    '<button class="btn primary" data-go="reply">生成回复建议</button>' +
+    '<div style="height:10px"></div>' +
+    '<button class="btn ghost" data-go="panel">回到攻略面板</button>' +
+  '</div>';
+}
+
+function replyScreen() {
+  const p = person();
+  const alert = p.id === 'demo';
+  const tones = D.tones.map(function (t, i) {
+    return '<div class="chip ' + (i === 0 ? 'on' : '') + '"><span>' + t + '</span></div>';
+  }).join('');
+  const cands = p.replies.map(function (r) {
+    return '<div class="card cand ' + (r.good ? '' : 'skip') + '">' +
+      '<div class="txt">' + r.text + '</div>' +
+      '<div class="meta"><span class="tag ' + (r.good ? 'ok' : '') + '">' + r.tagText + '</span><span>' + r.meta + '</span>' +
+      (r.good ? '<span class="copy" data-copy="' + r.text.replace(/"/g, '&quot;') + '">复制</span>' : '') +
+      '</div></div>';
+  }).join('');
+  return '<div class="screen enter">' +
+    '<div class="topbar"><button class="back" data-go="analysis">‹</button><span class="tt">回复建议</span></div>' +
+    '<div class="bubble">' + p.last + '</div>' +
+    '<div style="height:12px"></div>' +
+    '<div class="chips">' + tones + '</div>' +
+    (alert ? '<div class="boundary alert" style="margin-bottom:12px"><em></em><span>已停用 3 条邀约模板：她说了「改天吧」，这次不推进。</span></div>' : '') +
+    cands +
+    '<p class="tiny">三条里有一条是故意留给你对照的。能不能发，你自己判。</p>' +
+  '</div>';
+}
+
+function templatesScreen() {
+  const scenes = ['全部', '初识', '暧昧', '冲突', '边界'].map(function (s, i) {
+    return '<div class="chip ' + (i === 0 ? 'on' : '') + '"><span>' + s + '</span></div>';
+  }).join('');
+  const list = TEMPLATES.map(function (t) {
+    return '<div class="card tpl"><div class="t">' + t.t + '</div><div class="m"><i>' + t.s + '</i><i>' + t.tags.join(' · ') + '</i></div></div>';
+  }).join('');
+  return '<div class="screen enter">' +
+    '<div class="topbar"><span class="tt">模板库</span></div>' +
+    '<input class="input" placeholder="搜场景、语气或一句话" style="margin-bottom:10px">' +
+    '<div class="chips">' + scenes + '</div>' +
+    list +
+    '<p class="tiny">首版种子 100 条，这里只放 8 条示意。</p>' +
+  '</div>';
+}
+
+function newScreen() {
+  return '<div class="screen enter">' +
+    '<div class="topbar"><button class="back" data-go="home">‹</button><span class="tt">新建对象</span></div>' +
+    '<div class="card" style="padding:15px 15px 5px">' +
+      '<div class="field"><label>怎么称呼她</label><input class="input" placeholder="林夏"></div>' +
+      '<div class="field"><label>怎么认识的</label><input class="input" placeholder="朋友介绍 / 同事 / 同城活动"></div>' +
+      '<div class="field"><label>她在意的事</label><input class="input" placeholder="电影、猫、讨厌熬夜"></div>' +
+      '<div class="field"><label>你自己知道的分寸</label><textarea class="area" style="height:92px" placeholder="比如：不要在她忙的时候连发消息"></textarea></div>' +
+    '</div>' +
+    '<div style="height:14px"></div>' +
+    '<button class="btn primary" data-go="home">保存</button>' +
+  '</div>';
+}
+
+function settingsScreen() {
+  const has = D.apiKey ? '已保存到本机（' + D.apiKey.slice(0, 3) + '****' + D.apiKey.slice(-4) + '）' : '还没填。没填时只走模板库，不报错。';
+  return '<div class="screen enter">' +
+    '<div class="topbar"><button class="back" data-go="me">‹</button><span class="tt">模型设置</span></div>' +
+    '<div class="card" style="padding:15px">' +
+      '<div class="field"><label>DeepSeek API Key</label><input class="input" id="keyinput" type="password" placeholder="sk-..." value="' + D.apiKey + '"></div>' +
+      '<div class="row2"><button class="btn line sm" id="save-key">保存到本机</button><button class="btn line sm" id="clear-key">清除</button></div>' +
+      '<p class="sub" id="keystate" style="margin-top:12px">' + has + '</p>' +
+    '</div>' +
+    '<div style="height:12px"></div>' +
+    '<div class="privacy"><span>✦</span><div>Key 只存在这台设备的 secure storage 里，不上传、不进日志、不进代码仓库。换设备要重新填。</div></div>' +
+    '<div style="height:12px"></div>' +
+    '<div class="boundary"><em></em><span>网页版直连会被浏览器的跨域策略拦掉。想跑通真实请求，要用 Windows 桌面版或 Android 真机。</span></div>' +
+  '</div>';
+}
+
+function meScreen() {
+  return '<div class="screen enter">' +
+    '<div class="topbar"><span class="tt">我的</span></div>' +
+    '<div class="card rows" style="padding:2px 15px">' +
+      '<div class="rowitem" data-go="settings">模型设置<span class="go">›</span></div>' +
+      '<div class="rowitem">导出我的数据<span class="go">›</span></div>' +
+      '<div class="rowitem">删除聊天原文<span class="go">›</span></div>' +
+      '<div class="rowitem danger">删除账户<span class="go">›</span></div>' +
+      '<div class="rowitem">关于<span class="go">›</span></div>' +
+    '</div>' +
+    '<p class="tiny" style="margin-top:22px">妙恋畅语 · 原型 v2.12<br>设计与排布 · 阿砚 · 2026-10-25</p>' +
+  '</div>';
+}
+
+function welcomeScreen() {
+  return '<div class="screen enter"><div class="welcome">' +
+    '<div class="logo">♡</div>' +
+    '<h1>妙恋畅语</h1>' +
+    '<p>把聊不明白的话，说明白一点。</p>' +
+    '<ul class="pts">' +
+      '<li>粘贴聊天，看清热度怎么变</li>' +
+      '<li>三条候选回复，你自己挑</li>' +
+      '<li>推不推进，最后你说了算</li>' +
+    '</ul>' +
+    '<label class="agree"><input type="checkbox" id="agree"> 我确认这些聊天内容我有权提供，并且尊重对方的意愿和边界</label>' +
+    '<button class="btn primary" id="enter" disabled>开始</button>' +
+    '<div style="height:8px"></div>' +
+    '<button class="btn ghost" data-go="home">先随便看看</button>' +
+    '<p class="tiny">不需要注册。Key 只在你自己的设备上。</p>' +
+  '</div></div>';
+}
+
+const SCREENS = {
+  welcome: welcomeScreen, home: homeScreen, panel: panelScreen, import: importScreen, ocr: ocrScreen,
+  analysis: analysisScreen, reply: replyScreen, templates: templatesScreen,
+  new: newScreen, settings: settingsScreen, me: meScreen
+};
+
+function render() {
+  document.getElementById('view').innerHTML = (SCREENS[D.screen] || homeScreen)();
+  const dock = document.getElementById('dock');
+  dock.className = 'dock' + (D.screen === 'welcome' ? ' hide' : '');
+  Array.prototype.forEach.call(dock.querySelectorAll('[data-tab]'), function (el) {
+    el.className = el.dataset.tab === D.screen ? 'on' : '';
+  });
+  document.getElementById('view').scrollTop = 0;
+  if (D.screen === 'welcome') {
+    const cb = document.getElementById('agree');
+    const btn = document.getElementById('enter');
+    cb.addEventListener('change', function () { btn.disabled = !cb.checked; });
+    btn.addEventListener('click', function () { go('home'); });
+  }
+}
+
+function go(s) {
+  if (s === 'home' || s === 'panel') D.sampleMode = 'normal';
+  D.screen = s;
+  render();
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  clearTimeout(window.__tt);
+  window.__tt = setTimeout(function () { t.classList.remove('on'); }, 1600);
+}
+
+function openSheet(k) {
+  const p = PEOPLE[D.current];
+  const names = { fam: '熟悉度', heat: '互动热度', comf: '舒适度', off: '线下推进' };
+  const e = p.ev[k];
+  const t = trend(p.dims[k], p.prev[k]);
+  const sym = t.c === 'up' ? '↑ 升 ' + t.d + ' 点' : (t.c === 'down' ? '↓ 降 ' + Math.abs(t.d) + ' 点' : '— 基本没动');
+  document.getElementById('sheetbox').innerHTML =
+    '<div class="k"><b>' + names[k] + '</b><span>' + p.dims[k] + '<em>%</em></span></div>' +
+    '<div style="font-size:11px;margin-top:4px" class="' + t.c + '">' + sym + '（对比 ' + p.history[p.history.length - 2].d + '）</div>' +
+    '<p>' + e.text + '</p>' +
+    '<div class="crop"><div class="lbl">原图裁剪 · 只给你看这一句，不是识别出来的文字</div>' +
+    '<div class="cb">' + e.src + '</div>' +
+    '<div class="ts">微信截图 · 已裁掉头像与昵称</div></div>';
+  document.getElementById('sheet').classList.add('on');
+}
+
+document.addEventListener('click', function (ev) {
+  const sheet = document.getElementById('sheet');
+  if (ev.target === sheet) { sheet.classList.remove('on'); return; }
+  const fold = ev.target.closest('[data-fold]');
+  if (fold) {
+    const body = document.getElementById('fold-' + fold.dataset.fold);
+    body.classList.toggle('on');
+    return;
+  }
+  const dim = ev.target.closest('[data-dim]');
+  if (dim) { openSheet(dim.dataset.dim); return; }
+  const tab2 = ev.target.closest('[data-tab2]');
+  if (tab2) { D.importTab = tab2.dataset.tab2; render(); return; }
+  const ocr = ev.target.closest('[data-ocr]');
+  if (ocr) { const i = +ocr.dataset.ocr; D.ocrRows[i].me = !D.ocrRows[i].me; render(); return; }
+  if (ev.target.closest('[data-del]') || ev.target.closest('[data-add]')) { toast('原型里不真的删图'); return; }
+  if (ev.target.id === 'do-ocr') { toast('已在本机识别，文字不出设备'); go('ocr'); return; }
+  const pick = ev.target.closest('[data-pick]');
+  if (pick) { D.current = pick.dataset.pick; render(); return; }
+  const per = ev.target.closest('[data-person]');
+  if (per) {
+    D.current = per.dataset.person;
+    D.sampleMode = 'normal';
+    go('panel');
+    return;
+  }
+  const copy = ev.target.closest('[data-copy]');
+  if (copy) { toast('已复制，发不发你自己定'); return; }
+  const nav = ev.target.closest('[data-go]');
+  if (nav) { go(nav.dataset.go); return; }
+  if (ev.target.id === 'do-analyze') { toast('分析完成'); go('analysis'); return; }
+  if (ev.target.id === 'fill-normal') { D.sampleMode = 'normal'; go('import'); return; }
+  if (ev.target.id === 'fill-boundary') { D.sampleMode = 'boundary'; go('import'); return; }
+  if (ev.target.id === 'save-key') {
+    const v = document.getElementById('keyinput').value.trim();
+    D.apiKey = v;
+    if (v) lsSet('mly_api_key', v); else lsDel('mly_api_key');
+    document.getElementById('keystate').textContent = v ? '已保存到本机（' + v.slice(0, 3) + '****' + v.slice(-4) + '）' : '还没填。没填时只走模板库，不报错。';
+    toast(v ? '已存到本机' : '已清空');
+    return;
+  }
+  if (ev.target.id === 'clear-key') {
+    D.apiKey = '';
+    lsDel('mly_api_key');
+    document.getElementById('keyinput').value = '';
+    document.getElementById('keystate').textContent = '还没填。没填时只走模板库，不报错。';
+    toast('已清除');
+    return;
+  }
+});
+
+render();
+</script>
+</body>
+</html>

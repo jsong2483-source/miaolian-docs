@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="阿砚">
+  <title>妙恋畅语 · 攻略面板样图</title>
+  <style>
+    :root {
+      --ink: #302a3b;
+      --muted: #817a8c;
+      --line: #ece7ef;
+      --paper: #fffdfd;
+      --canvas: #f4f0f5;
+      --rose: #e87093;
+      --rose-soft: #fff0f4;
+      --purple: #7658b7;
+      --lavender: #f2edff;
+      --good: #3f9b78;
+      --radius: 17px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: var(--canvas); color: var(--ink); font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif; }
+    .layout { display: grid; grid-template-columns: 250px 360px; justify-content: center; align-items: start; gap: 48px; padding: 40px 20px; }
+    .notes { padding-top: 30px; }
+    .brand { display: flex; align-items: center; gap: 9px; font-weight: 800; color: var(--purple); font-size: 20px; }
+    .brand-mark { width: 28px; height: 28px; border-radius: 9px; background: var(--rose); color: #fff; display: grid; place-items: center; font-size: 16px; }
+    .notes h1 { font-size: 22px; margin: 24px 0 8px; line-height: 1.3; }
+    .notes p { color: var(--muted); font-size: 13px; line-height: 1.75; margin: 0 0 18px; }
+    .todo { border-left: 2px solid #d9ccf5; padding-left: 12px; font-size: 12px; color: var(--muted); line-height: 1.9; }
+    .todo b { color: var(--ink); font-weight: 500; display: block; margin-bottom: 4px; }
+    .credit { margin-top: 20px; font-size: 11px; color: #b3a9bd; }
+    .phone { width: 360px; height: 720px; background: var(--paper); border: 9px solid #2a2530; border-radius: 40px; position: relative; overflow: hidden; }
+    .status { padding: 10px 22px 0; display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
+    .switch { padding: 8px 16px 0; display: flex; align-items: center; gap: 8px; }
+    .chip { display: flex; align-items: center; gap: 6px; padding: 4px 10px 4px 4px; border-radius: 14px; background: #fff; border: 1px solid var(--line); }
+    .chip.on { background: var(--rose-soft); border-color: #f2b6c6; }
+    .chip .av { width: 26px; height: 26px; border-radius: 9px; color: #fff; font-size: 12px; display: grid; place-items: center; background: #71b6cf; }
+    .chip.on .av { background: var(--rose); }
+    .chip span { font-size: 12px; color: var(--muted); }
+    .chip.on span { color: var(--rose); font-weight: 500; }
+    .add { margin-left: auto; width: 28px; height: 28px; border-radius: 10px; background: var(--lavender); color: var(--purple); display: grid; place-items: center; font-size: 15px; }
+    .pad { padding: 12px 16px 0; }
+    .stage-box { padding: 14px; border-radius: 16px; background: #fffafd; border: 1px solid #eadff1; }
+    .stage-top { display: flex; justify-content: space-between; align-items: baseline; }
+    .stage-top strong { font-size: 15px; font-weight: 500; }
+    .trend { font-size: 11px; color: var(--rose); font-weight: 500; }
+    .stage-box p { margin: 6px 0 0; font-size: 11px; color: var(--muted); line-height: 1.6; }
+    .dims { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .dim { padding: 10px 11px; border-radius: 12px; background: #fff; border: 1px solid var(--line); cursor: pointer; }
+    .dim-line { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--muted); }
+    .dim-line i { font-style: normal; font-size: 12px; }
+    .up { color: var(--rose); }
+    .flat { color: #a096ac; }
+    .dim b { display: block; font-size: 14px; font-weight: 500; margin-top: 3px; }
+    .boundary { display: flex; align-items: center; gap: 7px; padding: 8px 10px; border-radius: 10px; background: #f6f4f8; font-size: 11px; color: #746d7c; }
+    .boundary em { width: 6px; height: 6px; border-radius: 50%; background: var(--good); display: block; }
+    .next { padding: 12px 13px; border-radius: 14px; background: #f8fffb; border: 1px solid #ddeee8; }
+    .next small { font-size: 11px; color: var(--good); font-weight: 500; }
+    .next p { margin: 5px 0 0; font-size: 12px; line-height: 1.6; color: var(--ink); }
+    .next a { display: inline-block; margin-top: 8px; font-size: 11px; color: var(--purple); text-decoration: none; }
+    .fold { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; font-size: 11px; color: var(--muted); cursor: pointer; }
+    .fold + .fold { border-top: 1px dashed #eee8f1; }
+    .nav { position: absolute; left: 0; right: 0; bottom: 0; height: 64px; background: var(--paper); border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-around; padding: 0 8px; }
+    .nav span { font-size: 11px; color: #9b94a2; }
+    .nav .center { text-align: center; margin-top: -18px; }
+    .nav .center i { width: 42px; height: 42px; border-radius: 14px; background: var(--rose); color: #fff; display: grid; place-items: center; font-size: 15px; font-style: normal; }
+    .nav .center span { display: block; margin-top: 2px; color: var(--purple); font-weight: 500; }
+    @media (max-width: 760px) { .layout { display: block; padding: 0; } .notes { display: none; } .phone { width: 100%; height: 100vh; border: 0; border-radius: 0; } }
+  </style>
+</head>
+<body>
+  <main class="layout">
+    <aside class="notes">
+      <div class="brand"><span class="brand-mark">♡</span>妙恋畅语</div>
+      <h1>攻略面板<br>样图 v1.0</h1>
+      <p>解决两个矛盾：中间按钮要能一键直达，但对象有多个；一屏要装下六块，但用户只有 10 秒。</p>
+      <div class="todo">
+        <b>待确认 3 项</b>
+        1. 证据藏哪：默认全收，还是只展开「下一步」相关的那一个？<br>
+        2. 中间图标用「攻」字，还是换软一点？（如心形或头像）<br>
+        3. 这屏密度是挤还是空？
+      </div>
+      <div class="credit">设计与排布 · 阿砚<br>v1.0 · 2026-10-25</div>
+    </aside>
+
+    <section class="phone">
+      <div class="status"><span>9:41</span><span>5G</span></div>
+
+      <div class="switch">
+        <div class="chip on"><div class="av">夏</div><span>林夏</span></div>
+        <div class="chip"><div class="av">安</div><span>安然</span></div>
+        <div class="add">+</div>
+      </div>
+
+      <div class="pad">
+        <div class="stage-box">
+          <div class="stage-top"><strong>暧昧升温</strong><span class="trend">↑ 比上周更主动</span></div>
+          <p>她主动开启话题 3 次，上周 1 次；愿意聊到深夜。</p>
+        </div>
+      </div>
+
+      <div class="pad dims">
+        <div class="dim" onclick="alert('依据：她连续三次主动补充电影细节，也提到过家里的猫。')">
+          <div class="dim-line"><span>熟悉度</span><i class="up">↑</i></div><b>较高</b>
+        </div>
+        <div class="dim" onclick="alert('依据：她主动开启话题 3 次，上周 1 次。')">
+          <div class="dim-line"><span>互动热度</span><i class="up">↑</i></div><b>中等</b>
+        </div>
+        <div class="dim" onclick="alert('依据：她会用「哈哈」这类轻松应答，也愿意说自己累。')">
+          <div class="dim-line"><span>舒适度</span><i class="flat">→</i></div><b>较高</b>
+        </div>
+        <div class="dim" onclick="alert('依据：她提过「周末好像还有重映」，但没接住邀约。')">
+          <div class="dim-line"><span>线下推进</span><i class="flat">→</i></div><b>较低</b>
+        </div>
+      </div>
+
+      <div class="pad">
+        <div class="boundary"><em></em><span>边界检查：未发现回避或拒绝信号</span></div>
+      </div>
+
+      <div class="pad">
+        <div class="next">
+          <small>下一步</small>
+          <p>她提了重映却没接住。给一个容易拒绝的选择，把决定权留给她。</p>
+          <a href="#">去看回复建议 ›</a>
+        </div>
+      </div>
+
+      <div class="pad">
+        <div class="fold"><span>关键信息 · 电影 · 猫 · 忌熬夜</span><span>›</span></div>
+        <div class="fold"><span>时间线 · 近 30 天 3 条</span><span>›</span></div>
+      </div>
+
+      <nav class="nav">
+        <span>首页</span>
+        <span>对象</span>
+        <div class="center"><i>攻</i><span>攻略</span></div>
+        <span>回复</span>
+        <span>我的</span>
+      </nav>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="阿砚">
+  <title>妙恋畅语 · 攻略面板样图</title>
+  <style>
+    :root {
+      --ink: #1c1b22;
+      --muted: #7a7585;
+      --hair: rgba(28, 27, 34, .07);
+      --rose: #ff4f7b;
+      --rose-soft: rgba(255, 79, 123, .10);
+      --purple: #6c4ce0;
+      --lav: rgba(108, 76, 224, .09);
+      --good: #14a57c;
+      --glass: rgba(255, 255, 255, .68);
+      --glass-b: rgba(255, 255, 255, .85);
+      --shadow: 0 10px 30px rgba(38, 24, 64, .07);
+      --r: 24px;
+      --r-s: 18px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: #f3f0f6; color: var(--ink); font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+    .layout { display: grid; grid-template-columns: 258px 364px; justify-content: center; align-items: start; gap: 52px; padding: 40px 20px; }
+    .notes { padding-top: 26px; }
+    .brand { display: flex; align-items: center; gap: 9px; font-weight: 500; color: var(--purple); font-size: 20px; }
+    .brand-mark { width: 28px; height: 28px; border-radius: 10px; background: var(--rose); color: #fff; display: grid; place-items: center; font-size: 15px; }
+    .notes h1 { font-size: 22px; font-weight: 500; margin: 24px 0 8px; line-height: 1.3; }
+    .notes p { color: var(--muted); font-size: 13px; line-height: 1.8; margin: 0 0 18px; }
+    .todo { border-left: 2px solid rgba(108, 76, 224, .35); padding-left: 12px; font-size: 12px; color: var(--muted); line-height: 1.9; }
+    .todo b { color: var(--ink); font-weight: 500; display: block; margin-bottom: 4px; }
+    .credit { margin-top: 20px; font-size: 11px; color: #b0a9bd; }
+    .phone { width: 364px; height: 738px; background: #fbf9fd; border: 9px solid #232029; border-radius: 46px; position: relative; overflow: hidden; }
+    .phone::before { content: ""; position: absolute; width: 300px; height: 300px; border-radius: 50%; top: -110px; right: -90px; background: rgba(255, 79, 123, .14); filter: blur(46px); }
+    .phone::after { content: ""; position: absolute; width: 280px; height: 280px; border-radius: 50%; bottom: -90px; left: -100px; background: rgba(108, 76, 224, .13); filter: blur(48px); }
+    .screen { position: relative; z-index: 1; height: 100%; }
+    .status { padding: 11px 24px 0; display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
+    .switch { padding: 10px 18px 0; display: flex; align-items: center; gap: 8px; }
+    .chip { display: flex; align-items: center; gap: 7px; padding: 4px 12px 4px 4px; border-radius: 16px; background: rgba(255, 255, 255, .7); border: 1px solid var(--hair); }
+    .chip.on { background: #fff; border-color: rgba(255, 79, 123, .35); box-shadow: 0 4px 12px rgba(255, 79, 123, .12); }
+    .chip .av { width: 28px; height: 28px; border-radius: 11px; color: #fff; font-size: 12px; display: grid; place-items: center; background: #8ab4c9; }
+    .chip.on .av { background: var(--rose); }
+    .chip span { font-size: 12px; color: var(--muted); }
+    .chip.on span { color: var(--rose); font-weight: 500; }
+    .add { margin-left: auto; width: 30px; height: 30px; border-radius: 12px; background: var(--lav); color: var(--purple); display: grid; place-items: center; font-size: 16px; }
+    .pad { padding: 14px 18px 0; }
+    .card { border-radius: var(--r); background: var(--glass); border: 1px solid var(--glass-b); box-shadow: var(--shadow); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+    .stage { padding: 16px 17px; }
+    .stage-top { display: flex; justify-content: space-between; align-items: baseline; }
+    .stage-top strong { font-size: 16px; font-weight: 500; letter-spacing: -.01em; }
+    .trend { font-size: 11px; color: var(--rose); font-weight: 500; }
+    .stage p { margin: 7px 0 0; font-size: 11px; color: var(--muted); line-height: 1.7; }
+    .dims { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .dim { padding: 13px 14px 15px; cursor: pointer; }
+    .dim-head { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--muted); }
+    .dim-head i { font-style: normal; font-size: 12px; color: var(--rose); }
+    .dim-head i.f { color: #b3aabf; }
+    .num { font-size: 22px; font-weight: 500; letter-spacing: -.03em; margin-top: 5px; line-height: 1.1; }
+    .num small { font-size: 11px; font-weight: 400; color: var(--muted); margin-left: 1px; letter-spacing: 0; }
+    .bar { height: 3px; border-radius: 3px; background: rgba(28, 27, 34, .07); margin-top: 10px; overflow: hidden; }
+    .bar i { display: block; height: 100%; border-radius: 3px; background: var(--rose); }
+    .bar.p i { background: var(--purple); }
+    .boundary { display: flex; align-items: center; gap: 8px; padding: 11px 14px; border-radius: var(--r-s); background: rgba(20, 165, 124, .08); font-size: 11px; color: #2f6d5b; }
+    .boundary em { width: 6px; height: 6px; border-radius: 50%; background: var(--good); display: block; }
+    .next { padding: 15px 16px 14px; border-radius: var(--r); background: rgba(255, 255, 255, .82); border: 1px solid rgba(255, 255, 255, .9); box-shadow: 0 12px 28px rgba(38, 24, 64, .08); }
+    .next small { font-size: 11px; color: var(--good); font-weight: 500; }
+    .next p { margin: 6px 0 0; font-size: 12.5px; line-height: 1.65; }
+    .next a { display: inline-block; margin-top: 10px; font-size: 11.5px; color: var(--purple); text-decoration: none; font-weight: 500; }
+    .fold { display: flex; justify-content: space-between; align-items: center; padding: 11px 2px; font-size: 11px; color: var(--muted); cursor: pointer; }
+    .fold + .fold { border-top: 1px solid var(--hair); }
+    .nav { position: absolute; left: 0; right: 0; bottom: 0; height: 68px; background: rgba(255, 255, 255, .8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--hair); display: flex; align-items: center; justify-content: space-around; padding: 0 10px; z-index: 2; }
+    .nav span { font-size: 11px; color: #a49caf; }
+    .nav .center { text-align: center; margin-top: -20px; }
+    .nav .center i { width: 46px; height: 46px; border-radius: 17px; background: var(--rose); color: #fff; display: grid; place-items: center; font-size: 16px; font-style: normal; box-shadow: 0 10px 22px rgba(255, 79, 123, .35); }
+    .nav .center span { display: block; margin-top: 3px; color: var(--purple); font-weight: 500; }
+    @media (max-width: 780px) { .layout { display: block; padding: 0; } .notes { display: none; } .phone { width: 100%; height: 100vh; border: 0; border-radius: 0; } }
+  </style>
+</head>
+<body>
+  <main class="layout">
+    <aside class="notes">
+      <div class="brand"><span class="brand-mark">♡</span>妙恋畅语</div>
+      <h1>攻略面板<br>样图 v2.5</h1>
+      <p>按你的反馈改：档位换成百分数、配色重做、卡片改玻璃质感、圆角加大。</p>
+      <div class="todo">
+        <b>这一版动了什么</b>
+        数字改成 0-100，每个维度带一条细进度条和趋势箭头；主色换成更亮的玫红，去掉灰紫混搭；卡片改半透明 + 背景柔光；圆角 17 → 24。<br><br>
+        <b>还等你定</b>
+        1. 证据现在藏在点击里，要不要改成"直接露出半句原文"？<br>
+        2. 中间图标「攻」要不要换软一点？
+      </div>
+      <div class="credit">设计与排布 · 阿砚<br>v2.5 · 2026-10-25</div>
+    </aside>
+
+    <section class="phone">
+      <div class="screen">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+
+        <div class="switch">
+          <div class="chip on"><div class="av">夏</div><span>林夏</span></div>
+          <div class="chip"><div class="av">安</div><span>安然</span></div>
+          <div class="add">+</div>
+        </div>
+
+        <div class="pad">
+          <div class="card stage">
+            <div class="stage-top"><strong>暧昧升温</strong><span class="trend">↑ 比上周更主动</span></div>
+            <p>她主动开启话题 3 次，上周 1 次；愿意聊到深夜。</p>
+          </div>
+        </div>
+
+        <div class="pad dims">
+          <div class="card dim" onclick="alert('依据：她连续三次主动补充电影细节，也提到过家里的猫。')">
+            <div class="dim-head"><span>熟悉度</span><i>↑</i></div>
+            <div class="num">72<small>%</small></div>
+            <div class="bar"><i style="width:72%"></i></div>
+          </div>
+          <div class="card dim" onclick="alert('依据：她主动开启话题 3 次，上周 1 次。')">
+            <div class="dim-head"><span>互动热度</span><i>↑</i></div>
+            <div class="num">66<small>%</small></div>
+            <div class="bar"><i style="width:66%"></i></div>
+          </div>
+          <div class="card dim" onclick="alert('依据：她会用「哈哈」这类轻松应答，也愿意说自己累。')">
+            <div class="dim-head"><span>舒适度</span><i class="f">→</i></div>
+            <div class="num">81<small>%</small></div>
+            <div class="bar p"><i style="width:81%"></i></div>
+          </div>
+          <div class="card dim" onclick="alert('依据：她提过「周末好像还有重映」，但没接住邀约。')">
+            <div class="dim-head"><span>线下推进</span><i class="f">→</i></div>
+            <div class="num">38<small>%</small></div>
+            <div class="bar p"><i style="width:38%"></i></div>
+          </div>
+        </div>
+
+        <div class="pad">
+          <div class="boundary"><em></em><span>边界检查：未发现回避或拒绝信号</span></div>
+        </div>
+
+        <div class="pad">
+          <div class="next">
+            <small>下一步</small>
+            <p>她提了重映却没接住。给一个容易拒绝的选择，把决定权留给她。</p>
+            <a href="#">去看回复建议 ›</a>
+          </div>
+        </div>
+
+        <div class="pad">
+          <div class="fold"><span>关键信息 · 电影 · 猫 · 忌熬夜</span><span>›</span></div>
+          <div class="fold"><span>时间线 · 近 30 天 3 条</span><span>›</span></div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <span>首页</span>
+        <span>对象</span>
+        <div class="center"><i>攻</i><span>攻略</span></div>
+        <span>回复</span>
+        <span>我的</span>
+      </nav>
+    </section>
+  </main>
+</body>
+</html>

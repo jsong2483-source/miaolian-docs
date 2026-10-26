@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="阿砚">
+  <title>妙恋畅语 · 低保真原型</title>
+  <style>
+    :root {
+      --ink: #302a3b;
+      --muted: #817a8c;
+      --line: #ece7ef;
+      --paper: #fffdfd;
+      --canvas: #f4f0f5;
+      --rose: #e87093;
+      --rose-soft: #fff0f4;
+      --purple: #7658b7;
+      --lavender: #f2edff;
+      --good: #3f9b78;
+      --shadow: 0 18px 48px rgba(62, 42, 73, .14);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: var(--canvas); color: var(--ink); font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif; }
+    button, textarea { font: inherit; }
+    .layout { display: grid; grid-template-columns: 236px minmax(360px, 430px); justify-content: center; align-items: start; gap: 42px; padding: 36px 20px; }
+    .notes { max-width: 236px; padding-top: 34px; }
+    .brand { display: flex; align-items: center; gap: 9px; font-weight: 800; color: var(--purple); font-size: 21px; }
+    .brand-mark { width: 28px; height: 28px; border-radius: 9px; background: linear-gradient(145deg, #fa8eaa, #8a6bd0); color: white; display: grid; place-items: center; font-size: 17px; }
+    .notes h1 { font-size: 26px; margin: 26px 0 10px; line-height: 1.25; }
+    .notes p { color: var(--muted); font-size: 14px; line-height: 1.75; margin: 0 0 22px; }
+    .guide { border-left: 2px solid #d9ccf5; padding-left: 13px; font-size: 13px; color: var(--muted); line-height: 1.8; }
+    .credit { margin-top: 20px; font-size: 11px; letter-spacing: .04em; color: #b3a9bd; }
+    .phone { width: 402px; min-height: 830px; overflow: hidden; background: var(--paper); border: 9px solid #2a2530; border-radius: 42px; box-shadow: var(--shadow); position: relative; }
+    .status { height: 35px; padding: 9px 24px 0; display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; }
+    .screen { min-height: 737px; padding: 4px 18px 92px; display: none; animation: appear .22s ease-out; }
+    .screen.active { display: block; }
+    @keyframes appear { from { opacity: .25; transform: translateX(6px); } to { opacity: 1; transform: translateX(0); } }
+    .topline { display: flex; justify-content: space-between; align-items: center; min-height: 43px; }
+    .eyebrow { color: var(--rose); letter-spacing: .08em; font-size: 11px; font-weight: 800; }
+    .title { font-size: 25px; margin: 5px 0 3px; letter-spacing: -.04em; }
+    .subtitle { margin: 0; color: var(--muted); font-size: 13px; }
+    .icon-button { border: 0; width: 35px; height: 35px; border-radius: 12px; background: var(--lavender); color: var(--purple); font-size: 19px; cursor: pointer; }
+    .hero { margin-top: 20px; padding: 17px; border-radius: 19px; background: linear-gradient(130deg, #fff0f4, #f5efff); position: relative; overflow: hidden; }
+    .hero:after { content: "♥"; position: absolute; right: 18px; bottom: -19px; color: rgba(232,112,147,.18); font-size: 87px; }
+    .hero small { color: var(--purple); font-weight: 800; font-size: 11px; }
+    .hero h2 { margin: 7px 0 7px; font-size: 18px; }
+    .hero p { margin: 0; max-width: 240px; line-height: 1.55; color: #675d70; font-size: 13px; }
+    .section-title { display: flex; align-items: center; justify-content: space-between; margin: 24px 1px 11px; font-size: 15px; font-weight: 800; }
+    .text-button { background: none; color: var(--purple); border: 0; font-size: 12px; cursor: pointer; }
+    .person-card { background: #fff; border: 1px solid var(--line); border-radius: 17px; padding: 14px; display: flex; gap: 12px; margin-bottom: 10px; cursor: pointer; box-shadow: 0 3px 12px rgba(60,40,70,.035); }
+    .avatar { width: 45px; height: 45px; flex: 0 0 45px; border-radius: 15px; display: grid; place-items: center; font-size: 20px; font-weight: 800; color: white; background: linear-gradient(135deg, #f48fa9, #a98ade); }
+    .avatar.blue { background: linear-gradient(135deg, #71b6cf, #9382da); }
+    .person-card h3 { font-size: 15px; margin: 1px 0 5px; }
+    .person-card p { margin: 0; color: var(--muted); font-size: 12px; }
+    .stage { align-self: flex-start; margin-left: auto; padding: 5px 8px; border-radius: 9px; white-space: nowrap; background: var(--rose-soft); color: var(--rose); font-size: 11px; font-weight: 800; }
+    .stage.blue { background: #edf8fa; color: #4a94aa; }
+    .bottom-nav { position: absolute; left: 0; bottom: 0; right: 0; min-height: 78px; display: flex; justify-content: space-around; align-items: center; padding: 7px 12px 13px; background: rgba(255,253,253,.96); border-top: 1px solid var(--line); }
+    .nav-item { border: 0; background: none; color: #9b94a2; cursor: pointer; min-width: 64px; font-size: 10px; display: grid; gap: 4px; place-items: center; }
+    .nav-item b { font-size: 19px; font-weight: 500; }
+    .nav-item.active { color: var(--purple); font-weight: 800; }
+    .nav-item.add b { width: 43px; height: 43px; border-radius: 15px; background: linear-gradient(135deg, var(--rose), #9d76d9); color: #fff; display: grid; place-items: center; margin-top: -22px; box-shadow: 0 7px 15px rgba(164,93,161,.24); }
+    .back { border: 0; background: none; font-size: 22px; padding: 2px 6px 2px 0; color: var(--ink); cursor: pointer; }
+    .profile-head { display: flex; align-items: center; gap: 12px; margin: 15px 0 19px; }
+    .profile-head .avatar { width: 58px; height: 58px; border-radius: 19px; font-size: 24px; }
+    .profile-head h2 { margin: 0 0 5px; font-size: 20px; }
+    .profile-head p { margin: 0; color: var(--muted); font-size: 12px; }
+    .temp-box { border: 1px solid #eadff1; border-radius: 19px; padding: 15px; background: linear-gradient(120deg, #fffafd, #f9f6ff); }
+    .temp-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .temp-top strong { font-size: 17px; }
+    .trend { font-size: 11px; font-weight: 800; white-space: nowrap; }
+    .trend.up { color: var(--rose); }
+    .trend.flat { color: #a096ac; }
+    .trend.down { color: #7f92a8; }
+    .temp-box .summary { color: #675d70; font-size: 12px; line-height: 1.65; margin: 9px 0 13px; }
+    .dims { display: grid; gap: 10px; }
+    .dim { border-top: 1px dashed #eae2f1; padding-top: 10px; }
+    .dim:first-child { border-top: 0; padding-top: 0; }
+    .dim-line { display: flex; align-items: center; gap: 7px; }
+    .dim-name { font-size: 12px; font-weight: 800; }
+    .dim-lv { font-size: 12px; font-weight: 800; color: var(--purple); background: #f1eaff; padding: 2px 7px; border-radius: 6px; font-variant-numeric: tabular-nums; }
+    .dim .trend { margin-left: auto; }
+    .ev { margin: 5px 0 0; font-size: 11px; line-height: 1.55; color: var(--muted); cursor: pointer; }
+    .ev b { color: #b3a5c6; }
+    .boundary { display: flex; gap: 8px; align-items: flex-start; margin-top: 13px; padding: 10px; border-radius: 12px; background: #f6f4f8; color: #746d7c; font-size: 11px; line-height: 1.55; }
+    .boundary span { color: var(--good); font-size: 13px; }
+    .boundary.alert { background: #fff6f1; color: #8a5b3f; border: 1px solid #f3ddcd; }
+    .boundary.alert span { color: #c1663f; }
+    .next-card { padding: 15px; border: 1px solid #ddeee8; border-radius: 17px; background: #f8fffb; }
+    .next-card b { color: var(--good); font-size: 12px; }
+    .next-card p { margin: 8px 0 0; font-size: 13px; line-height: 1.55; }
+    .timeline { display: grid; gap: 14px; padding-left: 9px; border-left: 2px solid #eee8f1; margin: 5px 0 0 6px; }
+    .event { position: relative; padding-left: 12px; font-size: 12px; color: #655f6b; }
+    .event:before { content: ""; position: absolute; left: -15px; top: 3px; width: 7px; height: 7px; border-radius: 50%; background: var(--rose); }
+    .event b { color: var(--ink); display: block; margin-bottom: 3px; }
+    .privacy { display: flex; gap: 9px; align-items: flex-start; background: #f5f2f7; color: #746d7c; font-size: 11px; line-height: 1.55; border-radius: 12px; padding: 11px; margin: 12px 0; }
+    .privacy span { color: var(--purple); font-size: 15px; }
+    .chat-input { width: 100%; height: 191px; resize: none; outline: none; border: 1px solid #e5dde9; border-radius: 17px; padding: 14px; color: #4c4553; line-height: 1.7; font-size: 13px; background: #fff; }
+    .chat-input:focus { border-color: #beaddc; box-shadow: 0 0 0 3px #f4effd; }
+    .role-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 4px; }
+    .role { border: 1px solid var(--line); background: #fff; color: #6e6875; border-radius: 10px; padding: 7px 9px; font-size: 11px; cursor: pointer; }
+    .role.selected { border-color: #d2bfe9; color: var(--purple); background: var(--lavender); font-weight: 800; }
+    .primary { width: 100%; border: 0; cursor: pointer; color: white; background: linear-gradient(110deg, var(--rose), #8c6bca); padding: 13px; border-radius: 14px; margin-top: 16px; font-weight: 800; box-shadow: 0 8px 15px rgba(187,105,161,.22); }
+    .analysis-card { padding: 14px; border: 1px solid var(--line); border-radius: 16px; margin: 10px 0; }
+    .analysis-card h3 { font-size: 13px; margin: 0 0 7px; }
+    .analysis-card p { margin: 0; color: #68616e; line-height: 1.6; font-size: 12px; }
+    .message { border-radius: 16px; padding: 12px 13px; width: fit-content; max-width: 82%; margin: 13px 0 6px; color: #4f4552; background: #f2eef5; font-size: 13px; line-height: 1.55; }
+    .message-label { color: var(--muted); font-size: 11px; }
+    .tone-tabs { display: flex; gap: 7px; overflow-x: auto; padding: 2px 0 5px; }
+    .tone { white-space: nowrap; border: 1px solid var(--line); background: #fff; color: #6e6875; border-radius: 20px; padding: 7px 11px; font-size: 11px; cursor: pointer; }
+    .tone.active { color: var(--rose); border-color: #f2b6c6; background: var(--rose-soft); font-weight: 800; }
+    .reply { border: 1px solid var(--line); border-radius: 16px; padding: 13px; margin: 10px 0; }
+    .reply.recommended { border-color: #d9c9ec; background: #fcfaff; }
+    .reply-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; }
+    .reply-head b { font-size: 12px; }
+    .reply-head span { color: var(--purple); font-size: 10px; background: var(--lavender); border-radius: 6px; padding: 3px 6px; }
+    .reply p { font-size: 13px; line-height: 1.6; margin: 0 0 10px; }
+    .reply-foot { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 10px; }
+    .copy { color: var(--purple); background: none; border: 0; cursor: pointer; font-weight: 800; font-size: 11px; }
+    .toast { position: absolute; left: 50%; bottom: 88px; transform: translateX(-50%) translateY(15px); opacity: 0; transition: .2s; background: #372e40; color: white; font-size: 12px; padding: 9px 13px; white-space: nowrap; border-radius: 18px; pointer-events: none; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    @media (max-width: 700px) { .layout { display: block; padding: 0; } .notes { display: none; } .phone { width: 100%; min-height: 100vh; border: 0; border-radius: 0; } .screen { min-height: calc(100vh - 35px); } }
+  </style>
+</head>
+<body>
+  <main class="layout">
+    <aside class="notes">
+      <div class="brand"><span class="brand-mark">♡</span>妙恋畅语</div>
+      <h1>手机端<br>低保真原型</h1>
+      <p>用示例对象“林夏”演示从人物档案、聊天分析到回复建议的完整体验。</p>
+      <div class="guide">点击“林夏”进入对象主页；从对象主页点击“分析聊天”，再生成回复建议。底部导航可返回首页。</div>
+      <div class="credit">原型评审与修订 · 阿砚<br>v2.5 · 2026-10-25</div>
+    </aside>
+    <section class="phone" aria-label="妙恋畅语原型">
+      <div class="status"><span>9:41</span><span>▮▮▮ 5G ◔</span></div>
+
+      <section id="home" class="screen active">
+        <div class="topline"><div><div class="eyebrow">MY RELATIONSHIP SPACE</div><h1 class="title">今天，想和谁聊聊？</h1><p class="subtitle">把关系慢慢聊得更清楚</p></div><button class="icon-button" aria-label="通知">⌁</button></div>
+        <div class="hero"><small>今日轻提醒</small><h2>先接住情绪，再表达自己</h2><p>好的沟通不是完美话术，而是让对方感到被认真回应。</p></div>
+        <div class="section-title"><span>我的心动对象</span><button class="text-button">查看全部</button></div>
+        <article class="person-card" onclick="showScreen('profile')"><div class="avatar">夏</div><div><h3>林夏</h3><p>最近一次互动：昨天 22:18</p></div><span class="stage">暧昧升温</span></article>
+        <article class="person-card"><div class="avatar blue">安</div><div><h3>安然</h3><p>还没有添加聊天分析</p></div><span class="stage blue">熟悉建立</span></article>
+        <div class="section-title"><span>为你准备</span></div>
+        <div class="next-card"><b>✦ 下一步小建议</b><p>和林夏聊电影时，先分享一个你自己的感受，再提一句「你要是想看我可以查排片」，把要不要看留给她决定。</p></div>
+      </section>
+
+      <section id="profile" class="screen">
+        <div class="topline"><button class="back" onclick="showScreen('home')">‹</button><button class="icon-button" aria-label="更多">•••</button></div>
+        <div class="profile-head"><div class="avatar">夏</div><div><h2>林夏</h2><p>认识 46 天 · 同城 · 电影爱好者</p></div></div>
+        <div class="temp-box"><div class="temp-top"><strong>暧昧升温</strong><span class="trend up">↑ 比上周更主动</span></div><p class="summary">这周她主动开启话题 3 次，上周是 1 次；愿意聊到深夜，也开始讲自己的事。整体在往热的方向走，但还没出现见面的具体提议。</p><div class="dims"><div class="dim"><div class="dim-line"><span class="dim-name">熟悉度</span><span class="dim-lv">72%</span><span class="trend up">↑</span></div><p class="ev" onclick="toast('定位到原文：她连续三次主动补充电影细节')"><b>依据 ·</b> 她连续三次主动补充电影细节，也提到过家里的猫。</p></div><div class="dim"><div class="dim-line"><span class="dim-name">互动热度</span><span class="dim-lv">66%</span><span class="trend up">↑</span></div><p class="ev" onclick="toast('定位到原文：上周 1 次，这周 3 次')"><b>依据 ·</b> 她主动开启话题 3 次，上周 1 次。</p></div><div class="dim"><div class="dim-line"><span class="dim-name">舒适度</span><span class="dim-lv">81%</span><span class="trend flat">→</span></div><p class="ev" onclick="toast('定位到原文：她用「哈哈」这类轻松应答')"><b>依据 ·</b> 她会用「哈哈」这类轻松应答，也愿意说自己累。</p></div><div class="dim"><div class="dim-line"><span class="dim-name">线下推进</span><span class="dim-lv">38%</span><span class="trend flat">→</span></div><p class="ev" onclick="toast('定位到原文：她提到重映，但没有应承')"><b>依据 ·</b> 她提过「周末好像还有重映」，但没接住邀约。</p></div></div><div class="boundary"><span>✓</span><div>边界检查：未发现回避或拒绝信号。若出现，下面的建议会整体切换为「暂不推进」。</div></div></div>
+        <div class="section-title"><span>下一步建议</span><button class="text-button" onclick="showScreen('analysis')">分析聊天 →</button></div>
+        <div class="next-card"><b>适合轻量邀约</b><p>她提了重映却没有接住，说明门开着但没走进去。给一个容易拒绝也不尴尬的具体选择，把决定权留给她，例如「你要是想看，我可以去查排片」。</p></div>
+        <div class="section-title"><span>关系时间线</span><button class="text-button">+ 记录事件</button></div>
+        <div class="timeline"><div class="event"><b>她分享了周末看的电影</b><span>昨天 · 聊天分析确认</span></div><div class="event"><b>第一次聊到喜欢的导演</b><span>10 月 18 日 · 用户记录</span></div><div class="event"><b>建立人物档案</b><span>9 月 9 日</span></div></div>
+      </section>
+
+      <section id="analysis" class="screen">
+        <div class="topline"><button class="back" onclick="showScreen('profile')">‹</button><span style="font-size:15px;font-weight:800">分析聊天</span><span style="width:29px"></span></div>
+        <div class="privacy"><span>♧</span><div>请仅提交你有权提供的内容。原始文本默认仅用于本次分析，不会自动长期保存。</div></div>
+        <div class="section-title"><span>粘贴最近的对话</span><button class="text-button" onclick="fillExample()">填入示例</button></div>
+        <textarea id="chatText" class="chat-input" aria-label="聊天记录" placeholder="例如：&#10;林夏：最近看了《花样年华》，后劲好大。&#10;我：我也喜欢，光影特别好看。&#10;林夏：是呀，周末好像还有重映。">林夏：最近看了《花样年华》，后劲好大。
+我：我也喜欢，光影特别好看。
+林夏：是呀，周末好像还有重映。</textarea>
+        <div class="role-row"><button class="role selected">“我”使用蓝色标记</button><button class="role selected">“对方”使用粉色标记</button></div>
+        <button class="primary" onclick="showScreen('analysisResult')">开始分析</button>
+      </section>
+
+      <section id="analysisResult" class="screen">
+        <div class="topline"><button class="back" onclick="showScreen('analysis')">‹</button><span style="font-size:15px;font-weight:800">聊天分析</span><button class="text-button" onclick="showScreen('assistant')">去回复 →</button></div>
+        <div class="hero"><small>本次互动摘要</small><h2>共同兴趣是很好的入口</h2><p>对方主动补充了“重映”信息，话题仍然开放，可以顺势轻量邀约。</p></div>
+        <div class="analysis-card"><h3>✦ 正向信号</h3><p>她没有只给出简短回应，而是继续提供具体活动信息，说明愿意延续这个话题。</p></div>
+        <div class="analysis-card"><h3>◌ 推荐方式</h3><p>先表达你对电影的一个小感受，再询问她是否有兴趣一起去；给对方充分的拒绝空间。</p></div>
+        <div class="analysis-card"><h3>⚑ 注意边界</h3><p>目前没有明确的见面承诺。若她回避邀约，可自然收回话题，不要连续追问。</p></div>
+        <button class="primary" onclick="showScreen('assistant')">根据这段对话生成回复</button>
+      </section>
+
+      <section id="assistant" class="screen">
+        <div class="topline"><button class="back" onclick="showScreen('analysisResult')">‹</button><span style="font-size:15px;font-weight:800">回复助手</span><button class="icon-button" aria-label="设置">⌘</button></div>
+        <div class="message-label">林夏刚刚说</div><div class="message">是呀，周末好像还有重映。</div>
+        <div class="section-title"><span>想用什么语气？</span></div>
+        <div class="tone-tabs"><button class="tone active" onclick="selectTone(this)">温柔自然</button><button class="tone" onclick="selectTone(this)">轻松幽默</button><button class="tone" onclick="selectTone(this)">真诚直接</button><button class="tone" onclick="selectTone(this)">克制一点</button></div>
+        <div class="section-title"><span>给你的 3 个建议</span><button class="text-button" onclick="toast('已为你重新生成')">↻ 换一组</button></div>
+        <article class="reply recommended"><div class="reply-head"><b>推荐 · 自然邀约</b><span>匹配电影话题</span></div><p>我刚好也想再看一次，银幕上应该会更有感觉。你要是周末有空，我们可以一起去？</p><div class="reply-foot"><span>真诚、轻量，方便对方回应</span><button class="copy" onclick="copyReply(this)">复制</button></div></article>
+        <article class="reply"><div class="reply-head"><b>轻松 · 给出选择</b><span>降低压力</span></div><p>那我得看看附近哪家有排片了。要不要把它列进周末备选节目？</p><div class="reply-foot"><span>不急着确定时间</span><button class="copy" onclick="copyReply(this)">复制</button></div></article>
+        <article class="reply"><div class="reply-head"><b>共鸣 · 继续聊天</b><span>先不邀约</span></div><p>我也觉得它特别适合在大银幕看。你最喜欢里面哪一段？</p><div class="reply-foot"><span>适合先延续话题</span><button class="copy" onclick="copyReply(this)">复制</button></div></article>
+      </section>
+
+      <nav class="bottom-nav" aria-label="主导航"><button class="nav-item active" onclick="showScreen('home')"><b>⌂</b>首页</button><button class="nav-item" onclick="showScreen('profile')"><b>♡</b>对象</button><button class="nav-item add" onclick="showScreen('analysis')"><b>＋</b>分析</button><button class="nav-item" onclick="showScreen('assistant')"><b>✦</b>回复</button><button class="nav-item" onclick="toast('设置模块将在后续版本实现')"><b>☷</b>我的</button></nav>
+      <div id="toast" class="toast" role="status"></div>
+    </section>
+  </main>
+  <script>
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(screen => screen.classList.toggle('active', screen.id === id));
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      const navIndex = ({ home: 0, profile: 1, analysis: 2, analysisResult: 2, assistant: 3 })[id];
+      const navItems = document.querySelectorAll('.nav-item');
+      if (navIndex !== undefined) navItems[navIndex].classList.add('active');
+    }
+    function selectTone(button) { document.querySelectorAll('.tone').forEach(item => item.classList.remove('active')); button.classList.add('active'); }
+    function fillExample() { document.getElementById('chatText').value = '林夏：最近看了《花样年华》，后劲好大。\n我：我也喜欢，光影特别好看。\n林夏：是呀，周末好像还有重映。'; toast('已填入示例对话'); }
+    function copyReply(button) { const copyText = button.closest('.reply').querySelector('p').textContent; navigator.clipboard?.writeText(copyText); toast('回复已复制，可再按你的语气修改'); }
+    function toast(message) { const el = document.getElementById('toast'); el.textContent = message; el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 2100); }
+  </script>
+</body>
+</html>
